@@ -35,7 +35,7 @@ dnf module enable ruby:3.3 -y
 dnf module -y update ruby:3.3
 yum install -y ruby
 ruby -v
-yum install -y gcc gcc-c++ make libffi-devel libxml2-devel libxslt-devel zlib-devel ruby-devel
+yum install -y gcc gcc-c++ make libffi-devel libxml2-devel libxslt-devel zlib-devel ruby-devel liburing
 gem install bundle
 #clone repository
 git clone $PACKAGE_URL
