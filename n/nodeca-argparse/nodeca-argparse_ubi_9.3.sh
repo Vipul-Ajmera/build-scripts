@@ -4,7 +4,7 @@
 # Package          : nodeca-argparse
 # Version          : 2.0.1
 # Source repo      : https://github.com/nodeca/argparse.git
-# Tested on        : UBI: 9.3
+# Tested on        : UBI:9.3
 # Language         : JavaScript
 # Travis-Check     : True
 # Script License   : Apache License, Version 2 or later
