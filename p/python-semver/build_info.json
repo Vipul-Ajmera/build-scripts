@@ -1,8 +1,8 @@
 {
-  "maintainer": "AbhiIBM",
+  "maintainer": "Vipul-Ajmera",
   "package_name": "python-semver",
   "github_url": "https://github.com/python-semver/python-semver",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "default_branch": "master",
   "package_dir": "p/python-semver",
   "build_script": "python-semver_ubi_8.7.sh",
