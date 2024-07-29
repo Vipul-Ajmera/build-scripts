@@ -8,7 +8,7 @@
 # Language         : TypeScript
 # Travis-Check     : True
 # Script License   : Apache License, Version 2 or later
-# Maintainer       : Abhishek Dwivedi <Abhishek.Dwivedi6@ibm.com>
+# Maintainer       : Vipul Ajmera <Vipul.Ajmera@ibm.com>
 #
 # Disclaimer       : This script has been tested in root mode on given
 # ==========         platform using the mentioned version of the package.
@@ -24,12 +24,9 @@ PACKAGE_VERSION=master
 PACKAGE_URL=https://github.com/DefinitelyTyped/DefinitelyTyped
 
 export NODE_VERSION=${NODE_VERSION:-18}
-OS_NAME=$(grep ^PRETTY_NAME /etc/os-release | cut -d= -f2)
-
-export NODE_OPTIONS="--dns-result-order=ipv4first"
 
 # Install dependencies
-yum install -y python3 python3-devel git gcc gcc-c++ libffi make
+yum install -y python3.11 python3.11-devel git gcc gcc-c++ libffi make
 
 #Installing nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
