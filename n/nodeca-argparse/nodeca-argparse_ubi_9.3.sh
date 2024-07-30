@@ -22,17 +22,9 @@
 PACKAGE_NAME="argparse"
 PACKAGE_VERSION=${1:-2.0.1}
 PACKAGE_URL="https://github.com/nodeca/argparse.git"
-export NODE_VERSION=${NODE_VERSION:-20}
 
 #install dependencies
-sudo yum install -y python3 python3-devel.ppc64le git gcc gcc-c++ libffi make
-
-#Installing nvm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-source "$HOME"/.bashrc
-echo "installing nodejs $NODE_VERSION"
-nvm install "$NODE_VERSION" >/dev/null
-nvm use $NODE_VERSION
+sudo yum install -y python3 python3-devel.ppc64le git gcc gcc-c++ libffi make nodejs
 
 #clone repository
 git clone $PACKAGE_URL
