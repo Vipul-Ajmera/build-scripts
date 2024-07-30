@@ -10,6 +10,6 @@
   "use_non_root_user": true,
   "docker_build": false,
   "*.*.*": {
-    "build_script": "nodeca-argparse_9.3.sh"
+    "build_script": "nodeca-argparse_ubi_9.3.sh"
   }
 }
