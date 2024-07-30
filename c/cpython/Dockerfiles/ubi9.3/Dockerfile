@@ -1,6 +1,6 @@
 FROM registry.access.redhat.com/ubi9/ubi:9.3
 
-Vipul Ajmera <Vipul.Ajmera@ibm.com>
+MAINTAINER Vipul Ajmera <Vipul.Ajmera@ibm.com>
 
 ARG PACKAGE_VERSION=v3.12.3
 
