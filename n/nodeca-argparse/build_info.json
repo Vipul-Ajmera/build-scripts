@@ -1,0 +1,15 @@
+{
+  "maintainer": "Vipul-Ajmera",
+  "package_name": "nodeca-argparse",
+  "github_url": "https://github.com/nodeca/argparse.git",
+  "version": "2.0.1",
+  "default_branch": "master",
+  "package_dir": "n/nodeca-argparse",
+  "build_script": "nodeca-argparse_ubi_9.3.sh",
+  "validate_build_script": true,
+  "use_non_root_user": true,
+  "docker_build": false,
+  "*.*.*": {
+    "build_script": "nodeca-argparse_ubi_9.3.sh"
+  }
+}

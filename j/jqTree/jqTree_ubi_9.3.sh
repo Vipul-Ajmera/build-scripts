@@ -5,7 +5,7 @@
 # Version          : 1.8.3
 # Source repo      : https://github.com/mbraak/jqTree.git
 # Tested on        : UBI:9.3
-# Language         : TypeScript
+# Language         : JavaScript
 # Travis-Check     : True
 # Script License   : Apache License, Version 2 or later
 # Maintainer       : Vipul Ajmera <Vipul.Ajmera@ibm.com>
