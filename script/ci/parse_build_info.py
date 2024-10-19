@@ -44,6 +44,7 @@ DOCKER_FILE = 'docker_file'
 BASE_CONTAINER = 'base_docker_image'
 NON_ROOT_USER = 'use_non_root_user'
 BUILD_SCRIPT_RAW_URL = 'build_script_raw_url'
+Wheel_CREATION = 'wheel_creation'
 
 build_details = {
     DOCKER_DIR : '',
@@ -56,6 +57,7 @@ build_details = {
     VALIDATE_BUILD_SCRIPT: True,
     NON_ROOT_USER : False,
     BUILD_SCRIPT_RAW_URL : ""
+    WHEEL_CREATION: False
 }
 
 if len(sys.argv) == 3:
@@ -97,6 +99,7 @@ if config_json:
     build_details[DOCKER_BUILD] = config_json[DOCKER_BUILD] if DOCKER_BUILD in config_json else True
     build_details[VALIDATE_BUILD_SCRIPT] = config_json[VALIDATE_BUILD_SCRIPT] if VALIDATE_BUILD_SCRIPT in config_json else True
     build_details[NON_ROOT_USER] = config_json[NON_ROOT_USER] if NON_ROOT_USER in config_json else False
+    build_details[WHEEL_CREATION] = config_json[WHEEL_CREATION] if WHEEL_CREATION in config_json else False
 
     # Check for the version in Json file otherwise try to match regex.
     if version not in config_json:
