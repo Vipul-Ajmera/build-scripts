@@ -73,7 +73,7 @@ jobs:
       script:
         - source package-cache/variable.sh
         - mkdir package-cache && sudo mv variable.sh package-cache
-        - chmod +x ./script/build_package.sh; bash ./script/build_package.sh;
+        - chmod +x ./script/build_package.sh; bash ./script/build_package_python.sh;
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" package-cache
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> package-cache/variable.sh
         - cd package-cache
@@ -98,7 +98,7 @@ jobs:
       script:
         - source package-cache/variable.sh
         - mkdir package-cache && sudo mv variable.sh package-cache
-        - chmod +x ./script/build_package.sh; bash ./script/build_package.sh;
+        - chmod +x ./script/build_package.sh; bash ./script/build_package_python.sh;
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" package-cache
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> package-cache/variable.sh
         - cd package-cache
