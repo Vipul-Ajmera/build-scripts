@@ -37,7 +37,8 @@ else
     fi    
 fi
 
-python3 script/validate_builds_currency.py "$PKG_DIR_PATH$BUILD_SCRIPT" "$VERSION" "$docker_image" > build_log &
+WHEEL_SCRIPT=script/build_script_python_create_wheel.sh
+python3 script/validate_builds_currency.py "$WHEEL_SCRIPT" "$VERSION" "$docker_image" "$PKG_DIR_PATH$BUILD_SCRIPT" > build_log &
 
 SCRIPT_PID=$!
 while ps -p $SCRIPT_PID > /dev/null
