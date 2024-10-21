@@ -127,7 +127,7 @@ jobs:
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
          - echo "Wheels created for Python 3.12:"; ls -l wheels/3.12/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_312
-        - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_311/variable.sh
+        - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_312/variable.sh
         - cd wheels_cache_312
         - sudo chown travis:travis -R .
         - ls -lt
