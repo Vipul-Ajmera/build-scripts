@@ -8,7 +8,7 @@ EXTRA_ARGS="${@:4}"  # Capture all additional arguments passed to the script
 CURRENT_DIR="${PWD}"  # Current directory
  
 #required dependencies for building python
-yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel
+yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
 
 # Function to install a specific Python version
 install_python_version() {
