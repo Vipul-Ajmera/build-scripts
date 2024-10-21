@@ -84,15 +84,16 @@ def trigger_script_validation_checks(file_name, version, image_name, additional_
     print(f"Additional file used by script: {additional_file}")
  
     # Extract just the file names
-    script_name = file_name.split("/")[-1]
-    additional_file_name = additional_file.split("/")[-1]
+    script_name = file_name.split("/")[1]
+    
+    additional_file_name = additional_file.split("/")[1]
  
     try:
         # Command to run only the main script (which uses the additional file internally)
         command = [
             "bash",
             "-c",
-            f"cd /home/tester/ && ./{script_name} {version} {additional_file} {package_name}"
+            f"cd /home/tester/ && ./{file_name} {version} {additional_file} {package_name}"
         ]
         
         # Run container
