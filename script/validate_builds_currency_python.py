@@ -186,4 +186,4 @@ def trigger_build_validation_travis(pr_number):
 if __name__=="__main__":
     #trigger_build_validation_travis(sys.argv[1])
     print("Inside python program")
-    trigger_script_validation_checks(sys.argv[1],sys.argv[2],sys.argv[3],argv[4],argv[5])
+    trigger_script_validation_checks(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5])
