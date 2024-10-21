@@ -75,7 +75,7 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_39 && sudo mv variable.sh wheels_cache_39
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.9:"; ls -l wheels/
+        - echo "Wheels created for Python 3.9:"; ls -l wheels/3.9
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package"  wheels_cache_39
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_39/variable.sh
         - cd  wheels_cache_39
@@ -94,16 +94,16 @@ jobs:
     
     - stage: Wheel Creation
       if: env(WHEEL_CREATION) = true
-      name: "Create Wheel for Python 3.10"
-      env: PYTHON_VERSION="3.10"
+      name: "Create Wheel for Python 3.11"
+      env: PYTHON_VERSION="3.11"
       script:
         - source variable.sh
-        - mkdir wheels_cache_310 && sudo mv variable.sh wheels_cache_310
+        - mkdir wheels_cache_311 && sudo mv variable.sh wheels_cache_311
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-         - echo "Wheels created for Python 3.10:"; ls -l wheels/
-        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_310
-        - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_310/variable.sh
-        - cd wheels_cache_310
+         - echo "Wheels created for Python 3.11:"; ls -l wheels/3.11
+        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_311
+        - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_311/variable.sh
+        - cd wheels_cache_311
         - sudo chown travis:travis -R .
         - ls -lt
         - echo $TRAVIS_BUILD_DIR
@@ -112,7 +112,32 @@ jobs:
         #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
       workspaces:
         create:
-          name: wheels_cache_310
+          name: wheels_cache_311
+          paths:
+            - wheels/
+        use: build_cache
+
+    - stage: Wheel Creation
+      if: env(WHEEL_CREATION) = true
+      name: "Create Wheel for Python 3.12"
+      env: PYTHON_VERSION="3.12"
+      script:
+        - source variable.sh
+        - mkdir wheels_cache_312 && sudo mv variable.sh wheels_cache_312
+        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+         - echo "Wheels created for Python 3.12:"; ls -l wheels/3.12/
+        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_312
+        - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_311/variable.sh
+        - cd wheels_cache_312
+        - sudo chown travis:travis -R .
+        - ls -lt
+        - echo $TRAVIS_BUILD_DIR
+        - cd $TRAVIS_BUILD_DIR
+        - gzip $TRAVIS_BUILD_DIR/build_log
+        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
+      workspaces:
+        create:
+          name: wheels_cache_312
           paths:
             - wheels/
         use: build_cache
