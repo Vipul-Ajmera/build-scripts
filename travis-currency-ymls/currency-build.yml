@@ -75,6 +75,7 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_39 && sudo mv variable.sh wheels_cache_39
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - echo "Wheels created for Python 3.9:"; ls -l wheels/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package"  wheels_cache_39
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_39/variable.sh
         - cd  wheels_cache_39
@@ -84,7 +85,6 @@ jobs:
         - cd $TRAVIS_BUILD_DIR
         - gzip $TRAVIS_BUILD_DIR/build_log
         #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
-        - echo "Wheels created for Python 3.9:"; ls -l wheels/
       workspaces:
         create:
           name: wheels_cache_39
@@ -100,6 +100,7 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_310 && sudo mv variable.sh wheels_cache_310
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+         - echo "Wheels created for Python 3.10:"; ls -l wheels/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_310
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_310/variable.sh
         - cd wheels_cache_310
@@ -109,7 +110,6 @@ jobs:
         - cd $TRAVIS_BUILD_DIR
         - gzip $TRAVIS_BUILD_DIR/build_log
         #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
-        - echo "Wheels created for Python 3.10:"; ls -l wheels/
       workspaces:
         create:
           name: wheels_cache_310
