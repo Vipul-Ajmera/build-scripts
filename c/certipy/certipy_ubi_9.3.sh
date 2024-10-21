@@ -22,17 +22,27 @@
 PACKAGE_NAME=certipy
 PACKAGE_VERSION=${1:-main}
 PACKAGE_URL=https://github.com/LLNL/certipy.git
- 
-# Install dependencies
-yum install -y --allowerasing yum-utils git gcc gcc-c++ make curl openssl-devel pkg-config
- 
+
 # Check if Python 3 is installed
 if ! command -v python3 &> /dev/null; then
   echo "Python 3 not found. Installing Python 3..."
-  yum install -y python3 python3-devel 
+  yum install -y python3 python3-pip python3-devel
+  if ! command -v python3 &> /dev/null; then
+    echo "Python 3 installation failed."
+    exit 1
+  fi
 else
   echo "Python 3 is already installed."
 fi
+ 
+# Ensure pip3 is installed
+if ! command -v pip3 &> /dev/null; then
+  echo "pip3 not found. Installing pip3..."
+  yum install -y python3-pip python3-devel
+fi
+
+# Install dependencies
+yum install -y --allowerasing yum-utils git gcc gcc-c++ make curl openssl-devel pkg-config
  
 # Check if Rust is installed
 if ! command -v rustc &> /dev/null; then
