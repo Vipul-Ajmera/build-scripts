@@ -72,9 +72,9 @@ jobs:
       name: "Create Wheel for Python 3.9"
       env: PYTHON_VERSION="3.9"
       script:
-        - source package-cache/variable.sh
+        - source variable.sh
         - mkdir package-cache && sudo mv variable.sh package-cache
-        - chmod +x ./script/build_package.sh; bash ./script/build_package_python.sh;
+        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" package-cache
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> package-cache/variable.sh
         - cd package-cache
@@ -83,23 +83,23 @@ jobs:
         - echo $TRAVIS_BUILD_DIR
         - cd $TRAVIS_BUILD_DIR
         - gzip $TRAVIS_BUILD_DIR/build_log
-        - chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
+        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
         - echo "Wheels created for Python 3.9:"; ls -l wheels/
       workspaces:
         create:
           name: wheels_cache_39
           paths:
             - wheels/
-        use: package_cache
+        use: build_cache
     
     - stage: Wheel Creation
       if: env(WHEEL_CREATION) = true
       name: "Create Wheel for Python 3.10"
       env: PYTHON_VERSION="3.10"
       script:
-        - source package-cache/variable.sh
+        - source variable.sh
         - mkdir package-cache && sudo mv variable.sh package-cache
-        - chmod +x ./script/build_package.sh; bash ./script/build_package_python.sh;
+        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" package-cache
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> package-cache/variable.sh
         - cd package-cache
@@ -108,14 +108,14 @@ jobs:
         - echo $TRAVIS_BUILD_DIR
         - cd $TRAVIS_BUILD_DIR
         - gzip $TRAVIS_BUILD_DIR/build_log
-        - chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
+        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
         - echo "Wheels created for Python 3.10:"; ls -l wheels/
       workspaces:
         create:
-          name: wheels_cache_39
+          name: wheels_cache_310
           paths:
             - wheels/
-        use: package_cache
+        use: build_cache
         
 
     - stage: Source code scanner
