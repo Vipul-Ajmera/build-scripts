@@ -19,20 +19,21 @@ install_python_version() {
             ;;
         "3.10")
             if ! python3.10 --version &> /dev/null; then
-                cd /usr/src
-				wget https://www.python.org/ftp/python/3.10.14/Python-3.10.14.tgz
-                tar xzf Python-3.10.14.tgz
-                cd Python-3.10.14
-                ./configure --enable-optimizations
-                make altinstall
-                ln -s /usr/local/bin/python3.10 /usr/bin/python3.10
-                rm -rf Python-3.10.14*
+                cd /usr/src && \
+		wget https://www.python.org/ftp/python/3.10.14/Python-3.10.14.tgz && \
+		tar xzf Python-3.10.14.tgz && \
+		cd Python-3.10.14 && \
+		./configure --enable-optimizations && \
+		make altinstall && \
+		ln -s /usr/local/bin/python3.10 /usr/bin/python3.10 && \
+		cd /usr/src && \
+		rm -rf Python-3.10.14.tgz Python-3.10.14
             fi
             ;;
         "3.13")
             if ! python3.13 --version &> /dev/null; then
                 cd /usr/src
-				wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0rc1.tgz
+		wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0rc1.tgz
                 tar xzf Python-3.13.0rc1.tgz
                 cd Python-3.13.0rc1
                 ./configure --enable-optimizations
