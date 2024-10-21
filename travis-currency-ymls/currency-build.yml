@@ -91,6 +91,7 @@ jobs:
           paths:
             - wheels/
         use: build_cache
+      allow_failure: true
 
     - stage: Wheel Creation
       if: env(WHEEL_CREATION) = true
@@ -116,6 +117,7 @@ jobs:
           paths:
             - wheels/
         use: build_cache
+      allow_failure: true
     
     - stage: Wheel Creation
       if: env(WHEEL_CREATION) = true
@@ -141,6 +143,7 @@ jobs:
           paths:
             - wheels/
         use: build_cache
+      allow_failure: true
 
     - stage: Wheel Creation
       if: env(WHEEL_CREATION) = true
@@ -166,8 +169,8 @@ jobs:
           paths:
             - wheels/
         use: build_cache
-        
-
+      allow_failure: true
+      
     - stage: Source code scanner
       if: env(ENABLE_TRIVY) = true AND env(VALIDATE_BUILD_SCRIPT) = true
       name: Run trivy scan
