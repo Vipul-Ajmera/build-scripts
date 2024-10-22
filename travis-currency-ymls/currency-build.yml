@@ -170,7 +170,33 @@ jobs:
             - wheels/
         use: build_cache
       allow_failure: true
-      
+
+    - stage: Wheel Creation
+      if: env(WHEEL_CREATION) = true
+      name: "Create Wheel for Python 3.13"
+      env: PYTHON_VERSION="3.13"
+      script:
+        - source variable.sh
+        - mkdir wheels_cache_313 && sudo mv variable.sh wheels_cache_313
+        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - echo "Wheels created for Python 3.13:"; ls -l wheels/
+        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package"  wheels_cache_313
+        - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_313/variable.sh
+        - cd  wheels_cache_313
+        - sudo chown travis:travis -R .
+        - ls -lt
+        - echo $TRAVIS_BUILD_DIR
+        - cd $TRAVIS_BUILD_DIR
+        - gzip $TRAVIS_BUILD_DIR/build_log
+        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
+      workspaces:
+        create:
+          name: wheels_cache_313
+          paths:
+            - wheels/
+        use: build_cache
+      allow_failure: true
+
     - stage: Source code scanner
       if: env(ENABLE_TRIVY) = true AND env(VALIDATE_BUILD_SCRIPT) = true
       name: Run trivy scan
