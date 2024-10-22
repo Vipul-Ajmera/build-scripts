@@ -7,14 +7,11 @@ EXTRA_ARGS="${@:4}"  # Capture all additional arguments passed to the script
  
 CURRENT_DIR="${PWD}"  # Current directory
  
-#required dependencies for building python
-#yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
-
 # Function to install a specific Python version
 install_python_version() {
     local version=$1
     case $version in
-        "3.9" | "3.11" | "3.12")
+        "3.9")
             yum install -y python${version} python${version}-devel python${version}-pip
             ;;
         "3.10")
@@ -38,12 +35,17 @@ install_python_version() {
 		rm get-pip.py
   	    fi
             cd "$CURRENT_DIR"
-
+            ;;
+        "3.11")
+            yum install -y python${version} python${version}-devel python${version}-pip
+            ;;
+        "3.12")
+            yum install -y python${version} 
             ;;
         "3.13")
             if ! python3.13 --version &> /dev/null; then
                 cd /usr/src
-		wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0rc1.tgz
+				wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0rc1.tgz
                 tar xzf Python-3.13.0rc1.tgz
                 cd Python-3.13.0rc1
                 ./configure --enable-optimizations
