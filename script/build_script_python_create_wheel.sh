@@ -15,7 +15,7 @@ install_python_version() {
     local version=$1
     case $version in
         "3.9" | "3.11" | "3.12")
-            yum install -y python${version} python${version}-devel
+            yum install -y python${version} python${version}-devel python${version}-pip
             ;;
         "3.10")
             if ! python3.10 --version &> /dev/null; then
