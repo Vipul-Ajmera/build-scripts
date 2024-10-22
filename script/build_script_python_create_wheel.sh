@@ -8,7 +8,7 @@ EXTRA_ARGS="${@:4}"  # Capture all additional arguments passed to the script
 CURRENT_DIR="${PWD}"  # Current directory
  
 #required dependencies for building python
-yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
+#yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
 
 # Function to install a specific Python version
 install_python_version() {
@@ -18,17 +18,27 @@ install_python_version() {
             yum install -y python${version} python${version}-devel python${version}-pip
             ;;
         "3.10")
+            #required dependencies for building python
+	    yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
             if ! python3.10 --version &> /dev/null; then
-                cd /usr/src && \
+                cd /opt && \
 		wget https://www.python.org/ftp/python/3.10.14/Python-3.10.14.tgz && \
-		tar xzf Python-3.10.14.tgz && \
-		cd Python-3.10.14 && \
-		./configure --enable-optimizations && \
-		make altinstall && \
-		ln -s /usr/local/bin/python3.10 /usr/bin/python3.10 && \
-		cd /usr/src && \
-		rm -rf Python-3.10.14.tgz Python-3.10.14
+    		tar xzf Python-3.10.14.tgz && \
+    		cd Python-3.10.14 && \
+    		./configure --enable-optimizations && \
+    		make altinstall && \
+    		ln -s /usr/local/bin/python3.10 /usr/bin/python3.10 && \
+    		cd /usr/src && \
+    		rm -rf Python-3.10.14.tgz Python-3.10.14
             fi
+    	    # Manually install pip if it's not installed
+    	    if ! python3.10 -m pip --version; then
+	        wget https://bootstrap.pypa.io/get-pip.py && \
+		python3.10 get-pip.py && \
+		rm get-pip.py
+  	    fi
+            cd "$CURRENT_DIR"
+
             ;;
         "3.13")
             if ! python3.13 --version &> /dev/null; then
