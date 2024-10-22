@@ -18,7 +18,7 @@ install_python_version() {
             #required dependencies for building python
 	    yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
             if ! python3.10 --version &> /dev/null; then
-                cd /opt && \
+                cd /usr/src && \
 		wget https://www.python.org/ftp/python/3.10.14/Python-3.10.14.tgz && \
     		tar xzf Python-3.10.14.tgz && \
     		cd Python-3.10.14 && \
@@ -40,19 +40,29 @@ install_python_version() {
             yum install -y python${version} python${version}-devel python${version}-pip
             ;;
         "3.12")
-            yum install -y python${version} 
+            yum install -y python${version} python${version}-devel python${version}-pip
             ;;
         "3.13")
             if ! python3.13 --version &> /dev/null; then
-                cd /usr/src
-				wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0rc1.tgz
-                tar xzf Python-3.13.0rc1.tgz
-                cd Python-3.13.0rc1
-                ./configure --enable-optimizations
-                make altinstall
-                ln -s /usr/local/bin/python3.13 /usr/bin/python3.13
-                rm -rf Python-3.13.0rc1*
+	        yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
+ 		cd /usr/src && \
+		wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0rc1.tgz && \
+    		tar xzf Python-3.13.0rc1.tgz && \
+    		cd Python-3.13.0rc1 && \
+    		./configure --enable-optimizations && \
+    		make altinstall && \
+    		ln -s /usr/local/bin/python3.13 /usr/bin/python3.13 && \
+    		ln -s /usr/local/bin/pip3.13 /usr/bin/pip3.13 && \
+    		cd /usr/src && \
+    		rm -rf Python-3.13.0rc1.tgz Python-3.13.0rc1
             fi
+            # Manually install pip if it's not installed
+    	    if ! python3.13 -m pip --version; then
+	        wget https://bootstrap.pypa.io/get-pip.py && \
+		python3.13 get-pip.py && \
+		rm get-pip.py
+  	    fi
+            cd "$CURRENT_DIR"
             ;;
         *)
             echo "Unsupported Python version: $version"
