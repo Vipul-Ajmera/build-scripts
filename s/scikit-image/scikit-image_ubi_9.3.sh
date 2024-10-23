@@ -20,7 +20,7 @@
 
 PACKAGE_NAME=scikit-image
 PACKAGE_VERSION=${1:-v0.24.0}
-PACKAGE_URL=https://github.com/scikit-image/scikit-image
+PACKAGE_URL=https://github.com/scikit-image/scikit-image.git
 
 OS_NAME=`cat /etc/os-release | grep "PRETTY" | awk -F '=' '{print $2}'`
 
