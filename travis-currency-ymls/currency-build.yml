@@ -75,7 +75,7 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_39 && sudo mv variable.sh wheels_cache_39
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.9:"; ls -l wheels/
+        - echo "Wheels created for Python 3.9:"; ls wheels/$PYTHON_VERSION/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package"  wheels_cache_39
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_39/variable.sh
         - cd  wheels_cache_39
@@ -101,7 +101,7 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_310 && sudo mv variable.sh wheels_cache_310
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.10:"; ls -l wheels/
+        - echo "Wheels created for Python 3.10:"; ls wheels/$PYTHON_VERSION/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package"  wheels_cache_310
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_310/variable.sh
         - cd  wheels_cache_310
@@ -127,7 +127,7 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_311 && sudo mv variable.sh wheels_cache_311
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-         - echo "Wheels created for Python 3.11:"; ls -l wheels/
+        - echo "Wheels created for Python 3.11:"; ls wheels/$PYTHON_VERSION/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_311
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_311/variable.sh
         - cd wheels_cache_311
@@ -153,7 +153,7 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_312 && sudo mv variable.sh wheels_cache_312
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-         - echo "Wheels created for Python 3.12:"; ls -l wheels/
+         - echo "Wheels created for Python 3.12:"; ls wheels/$PYTHON_VERSION/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_312
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_312/variable.sh
         - cd wheels_cache_312
@@ -179,7 +179,7 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_313 && sudo mv variable.sh wheels_cache_313
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.13:"; ls -l wheels/
+        - echo "Wheels created for Python 3.13:"; ls wheels/$PYTHON_VERSION/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package"  wheels_cache_313
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_313/variable.sh
         - cd  wheels_cache_313
