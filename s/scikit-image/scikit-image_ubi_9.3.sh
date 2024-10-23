@@ -1,26 +1,26 @@
 #!/bin/bash -e
 # -----------------------------------------------------------------------------
 #
-# Package       : scikit-image
-# Version       : v0.24.0
-# Source repo   : https://github.com/scikit-image/scikit-image
-# Tested on     : UBI 9.3
-# Language      : Python, Cython, C, C++
-# Travis-Check  : True
-# Script License: Apache License, Version 2 or later
-# Maintainer    : Salil Verlekar <Salil.Verlekar2@ibm.com>
+# Package          : scikit-image
+# Version          : v0.24.0
+# Source repo      : https://github.com/scikit-image/scikit-image.git
+# Tested on        : UBI:9.3
+# Language         : Python
+# Travis-Check     : True
+# Script License   : Apache License, Version 2 or later
+# Maintainer       : Vipul Ajmera <Vipul.Ajmera@ibm.com>
 #
-# Disclaimer: This script has been tested in root mode on given
-# ==========  platform using the mentioned version of the package.
-#             It may not work as expected with newer versions of the
-#             package and/or distribution. In such case, please
-#             contact "Maintainer" of this script.
+# Disclaimer       : This script has been tested in root mode on given
+# ==========         platform using the mentioned version of the package.
+#                    It may not work as expected with newer versions of the
+#                    package and/or distribution. In such case, please
+#                    contact "Maintainer" of this script.
 #
-# ----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 
 PACKAGE_NAME=scikit-image
 PACKAGE_VERSION=${1:-v0.24.0}
-PACKAGE_URL=https://github.com/scikit-image/scikit-image
+PACKAGE_URL=https://github.com/scikit-image/scikit-image.git
 
 OS_NAME=`cat /etc/os-release | grep "PRETTY" | awk -F '=' '{print $2}'`
 
