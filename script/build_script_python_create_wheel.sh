@@ -135,6 +135,7 @@ create_venv "$VENV_DIR" "$PYTHON_VERSION"
  
 echo "=============== Running package build-script starts =================="
 if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then  # Check if TEMP_BUILD_SCRIPT_PATH is non-empty
+    python"$PYTHON_VERSION" -m pip install --upgrade pip setuptools wheel build pytest nox tox
     sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS
 else
     echo "No build script to run, skipping execution."
