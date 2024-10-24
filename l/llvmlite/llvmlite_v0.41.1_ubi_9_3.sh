@@ -28,7 +28,7 @@ export PACKAGE_URL=https://github.com/numba/llvmlite
 
 # Install dependencies
 
-yum install -y git cmake sudo libffi-devel gcc-toolset-12 ninja-build python3-devel python3-wheel python3-pip python3-setuptools 
+yum install -y git cmake sudo libffi-devel gcc-toolset-12 ninja-build python3-devel python3-pip 
 
 python3 --version
 python3 -m pip install -U pip
