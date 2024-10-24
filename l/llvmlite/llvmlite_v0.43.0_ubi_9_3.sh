@@ -25,11 +25,11 @@ set -e
 export PACKAGE_VERSION=${1:-"v0.43.0"}
 export PACKAGE_NAME=llvmlite
 export PACKAGE_URL=https://github.com/numba/llvmlite
-export PYTHON_VER=${2:-"3.9"}
+
 
 # Install dependencies
 
-yum install -y git cmake sudo libffi-devel gcc-toolset-12 ninja-build python${PYTHON_VER}-devel python${PYTHON_VER}-wheel python${PYTHON_VER}-pip python${PYTHON_VER}-setuptools 
+yum install -y git cmake sudo libffi-devel gcc-toolset-12 ninja-build python3-devel python3-pip 
 
 python${PYTHON_VER} --version
 python${PYTHON_VER} -m pip install -U pip
