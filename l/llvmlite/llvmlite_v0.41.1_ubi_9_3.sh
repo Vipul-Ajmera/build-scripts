@@ -25,16 +25,15 @@ set -e
 export PACKAGE_VERSION=${1:-"v0.41.1"}
 export PACKAGE_NAME=llvmlite
 export PACKAGE_URL=https://github.com/numba/llvmlite
-export PYTHON_VER=${2:-"3.9"}
 
 # Install dependencies
 
-yum install -y git cmake sudo libffi-devel gcc-toolset-12 ninja-build python${PYTHON_VER}-devel python${PYTHON_VER}-wheel python${PYTHON_VER}-pip python${PYTHON_VER}-setuptools 
+yum install -y git cmake sudo libffi-devel gcc-toolset-12 ninja-build python3-devel python3-wheel python3-pip python3-setuptools 
 
-python${PYTHON_VER} --version
-python${PYTHON_VER} -m pip install -U pip
+python3 --version
+python3 -m pip install -U pip
 
-python${PYTHON_VER} -m venv buildenv
+python3 -m venv buildenv
 source buildenv/bin/activate
 source /opt/rh/gcc-toolset-12/enable
 
@@ -105,7 +104,7 @@ if !(python setup.py build) ; then
 fi
 
 deactivate
-python${PYTHON_VER} -m venv testenv
+python3 -m venv testenv
 source testenv/bin/activate
 
 # Run test cases
