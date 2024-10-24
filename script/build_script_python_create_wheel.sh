@@ -94,6 +94,7 @@ format_build_script() {
         sed -i 's/python[0-9]\+\.[0-9]\+-pip//g' "$TEMP_BUILD_SCRIPT_PATH"
 	sed -i 's/python3\.[0-9]\+/python/g' "$TEMP_BUILD_SCRIPT_PATH"
         sed -i 's/python3/python/g' "$TEMP_BUILD_SCRIPT_PATH"
+	sed -i '/yum install/{s/\<python-devel\>//g; s/\<python-pip\>//g}' "$TEMP_BUILD_SCRIPT_PATH"
 	sed -i '/yum install/{s/\<python\>//g}' "$TEMP_BUILD_SCRIPT_PATH"
     else
         echo "No build script specified, skipping copying."
