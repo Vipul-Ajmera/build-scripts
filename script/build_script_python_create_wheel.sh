@@ -3,7 +3,6 @@ set -e
 #variables
 PYTHON_VERSION=$1
 BUILD_SCRIPT_PATH=${2:-""} # its the build_script for the package
-TARGET_DIRECTORY=${3:-""}  # its the package name
 EXTRA_ARGS="${@:4}"  # Capture all additional arguments passed to the script
 CURRENT_DIR="${PWD}"  # Current directory
 
@@ -136,6 +135,9 @@ create_venv "$VENV_DIR" "$PYTHON_VERSION"
  
 echo "=============== Running package build-script starts =================="
 if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then  # Check if TEMP_BUILD_SCRIPT_PATH is non-empty
+    
+	package_name=$(grep -oP '(?<=^PACKAGE_NAME=).*' "$TEMP_BUILD_SCRIPT_PATH" | tr -d '"')
+	
     python"$PYTHON_VERSION" -m pip install --upgrade pip setuptools wheel build pytest nox tox
     sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS
 else
@@ -151,14 +153,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
  
-# Navigate to the user-provided directory or stay in the current directory
-if [ -n "$TARGET_DIRECTORY" ]; then
-    echo "Navigating to the specified directory: $TARGET_DIRECTORY"
-    cd "$TARGET_DIRECTORY" || { echo "Directory not found: $TARGET_DIRECTORY"; exit 1; }
-else
-    echo "No directory specified. Staying in the current directory."
-fi
  
+echo "Navigating to the specified directory" 
+cd $package_name
  
 # Build the wheel
 echo ""
