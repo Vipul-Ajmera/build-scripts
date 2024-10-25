@@ -69,7 +69,7 @@ def trigger_basic_validation_checks(file_name):
         raise ValueError("Build script not found.")
 
         
-def trigger_script_validation_checks(file_name, version, image_name, additional_file, package_name):
+def trigger_script_validation_checks(file_name, version, image_name, additional_file):
     # Docker client setup
     client = docker.DockerClient(base_url='unix://var/run/docker.sock')
     
@@ -93,7 +93,7 @@ def trigger_script_validation_checks(file_name, version, image_name, additional_
         command = [
             "bash",
             "-c",
-            f"cd /home/tester/ && ./{file_name} {version} {additional_file} {package_name}"
+            f"cd /home/tester/ && ./{file_name} {version} {additional_file}"
         ]
         
         # Run container
@@ -187,4 +187,4 @@ def trigger_build_validation_travis(pr_number):
 if __name__=="__main__":
     #trigger_build_validation_travis(sys.argv[1])
     print("Inside python program")
-    trigger_script_validation_checks(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5])
+    trigger_script_validation_checks(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4])
