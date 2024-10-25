@@ -9,7 +9,7 @@
  match_version=$VERSION
 
 #Extract foldername from github_url
-foldername=$(basename "${github_url%.git}")
+#foldername=$(basename "${github_url%.git}")
 
 if [ -f $buildinfo_path ]; then
   echo $package_dirpath 'exists'
@@ -111,8 +111,8 @@ echo "export VARIANT=$variant" >> $CUR_DIR/variable.sh
 echo "export BASENAME=$basename" >> $CUR_DIR/variable.sh
 echo "export NON_ROOT_BUILD=$nonRootBuild" >> $CUR_DIR/variable.sh
 echo "export TESTED_ON=$tested_on" >> $CUR_DIR/variable.sh
-#echo "export PACKAGE_NAME=$package_name" >> $CUR_DIR/variable.sh
-echo "export FOLDERNAME=$foldername" >>  $CUR_DIR/variable.sh
+echo "export PACKAGE_NAME=$package_name" >> $CUR_DIR/variable.sh
+#echo "export FOLDERNAME=$foldername" >>  $CUR_DIR/variable.sh
 
 chmod +x $CUR_DIR/variable.sh
 cat $CUR_DIR/variable.sh
