@@ -82,15 +82,12 @@ jobs:
         - cd  wheels_cache_3.9
         - sudo chown travis:travis -R .
         - ls -ltr
-        - tar -czvf wheels_cache_3.9/wheels_3.9.tar.gz wheels_3.9/
-        - echo "Wheels archive created:"
-        - ls wheels_cache_3.9/
         #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
-          name: wheels_cache_3.10
+          name: wheels_cache_3.9
           paths:
-            - wheels_3.10
+            - wheels_3.9
         use: build_cache
       allow_failure: true
 
