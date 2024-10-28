@@ -87,7 +87,7 @@ jobs:
         create:
           name: wheels_cache_39
           paths:
-            - wheels/
+            - wheels_3.9
         use: build_cache
       allow_failure: true
 
@@ -105,15 +105,12 @@ jobs:
         - cd  wheels_cache_310
         - sudo chown travis:travis -R .
         - ls -ltr
-        - echo $TRAVIS_BUILD_DIR
-        - cd $TRAVIS_BUILD_DIR
-        - gzip -r wheels
         #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_310
           paths:
-            - wheels/
+            - wheels_3.10
         use: build_cache
       allow_failure: true
     
@@ -131,15 +128,12 @@ jobs:
         - cd wheels_cache_311
         - sudo chown travis:travis -R .
         - ls -ltr
-        #- echo $TRAVIS_BUILD_DIR
-        #- cd $TRAVIS_BUILD_DIR
-        - gzip -r wheels
         #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_311
           paths:
-            - wheels/
+            - wheels_3.11
         use: build_cache
       allow_failure: true
 
@@ -157,16 +151,12 @@ jobs:
         - cd wheels_cache_312
         - sudo chown travis:travis -R .
         - ls -ltr
-        - echo $TRAVIS_BUILD_DIR
-        - cd $TRAVIS_BUILD_DIR
-        - gzip $TRAVIS_BUILD_DIR/build_log
-        - gzip -r wheels
         #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_312
           paths:
-            - wheels/
+            - wheels_3.12
         use: build_cache
       allow_failure: true
 
@@ -184,15 +174,11 @@ jobs:
         - cd  wheels_cache_313
         - sudo chown travis:travis -R .
         - ls -ltr
-        - echo $TRAVIS_BUILD_DIR
-        - cd $TRAVIS_BUILD_DIR
-        - gzip -r wheels
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_313
           paths:
-            - wheels/
+            - wheels_3.13
         use: build_cache
       allow_failure: true
 
