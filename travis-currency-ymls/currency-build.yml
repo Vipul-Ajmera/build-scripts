@@ -193,15 +193,15 @@ jobs:
 	  - wheels_cache_312
           - wheels_cache_313
       script:
-	      #create the main wheels dir
+	#create the main wheels dir
         - mkdir -p wheels
         - for version in 39 310 311 312; do
 	    mkdir -p wheels/$version
             find wheels_cache_$version -name "wheels_$version" -type d -exec find {} -name '*.whl' -exec cp {} wheels/$version/ \; \;
            done
-	      - find wheels -type f
+	- find wheels -type f
         #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh source_scanner.tar.gz	
-
+	
     - stage: Source code scanner
       if: env(ENABLE_TRIVY) = true AND env(VALIDATE_BUILD_SCRIPT) = true
       name: Run trivy scan
