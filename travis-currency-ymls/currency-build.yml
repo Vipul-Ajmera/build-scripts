@@ -85,7 +85,7 @@ jobs:
         create:
           name: wheels_cache_3.9
           paths:
-            - wheels_3.9
+            - .
         use: build_cache
       allow_failure: true
 
