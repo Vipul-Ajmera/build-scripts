@@ -185,7 +185,7 @@ jobs:
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_313/variable.sh
         - cd  wheels_cache_313
         - sudo chown travis:travis -R .
-        - ls -lt
+        - ls -ltr
         - echo $TRAVIS_BUILD_DIR
         - cd $TRAVIS_BUILD_DIR
         - gzip -r wheels
