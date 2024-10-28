@@ -77,9 +77,9 @@ jobs:
         - mkdir wheels_cache_39 && sudo mv variable.sh wheels_cache_39
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - echo "Wheels created for Python 3.9:"; ls wheels_3.9
-		- sudo mv wheels_3.9/ wheels_cache_39/
-		- cd wheels_cache_39
-		- ls -ltr
+	- sudo mv wheels_3.9/ wheels_cache_39/
+	- cd wheels_cache_39
+	- ls -ltr
       workspaces:
         create:
           name: wheels_cache_39
@@ -97,7 +97,7 @@ jobs:
         - mkdir wheels_cache_310 && sudo mv variable.sh wheels_cache_310
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - echo "Wheels created for Python 3.10:"; ls wheels_3.10
-		- sudo mv wheels_3.10/ wheels_cache_310/
+	- sudo mv wheels_3.10/ wheels_cache_310/
       workspaces:
         create:
           name: wheels_cache_310
@@ -115,7 +115,7 @@ jobs:
         - mkdir wheels_cache_311 && sudo mv variable.sh wheels_cache_311
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - echo "Wheels created for Python 3.11:"; ls wheels_3.11
-		- sudo mv wheels_3.11/ wheels_cache_311/
+	- sudo mv wheels_3.11/ wheels_cache_311/
       workspaces:
         create:
           name: wheels_cache_311
@@ -133,7 +133,7 @@ jobs:
         - mkdir wheels_cache_312 && sudo mv variable.sh wheels_cache_312
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - echo "Wheels created for Python 3.12:"; ls wheels_3.12
-		- sudo mv wheels_3.12/ wheels_cache_312/ 
+	- sudo mv wheels_3.12/ wheels_cache_312/ 
       workspaces:
         create:
           name: wheels_cache_312
@@ -167,10 +167,10 @@ jobs:
           - wheels_cache_39
           - wheels_cache_310
           - wheels_cache_311
-		  - wheels_cache_312
-		  - wheels_cache_313
+	  - wheels_cache_312
+          - wheels_cache_313
       script:
-	    #create the main wheels dir
+	#create the main wheels dir
         - mkdir wheels 
         #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh source_scanner.tar.gz	
 
