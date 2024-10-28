@@ -80,11 +80,11 @@ jobs:
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_39/variable.sh
         - cd  wheels_cache_39
         - sudo chown travis:travis -R .
-        - ls -lt
+        - ls -ltr
         - echo $TRAVIS_BUILD_DIR
         - cd $TRAVIS_BUILD_DIR
-        - gzip $TRAVIS_BUILD_DIR/build_log
-        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
+        - gzip -r wheels
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts_python/upload_file.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_39
@@ -106,11 +106,11 @@ jobs:
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_310/variable.sh
         - cd  wheels_cache_310
         - sudo chown travis:travis -R .
-        - ls -lt
+        - ls -ltr
         - echo $TRAVIS_BUILD_DIR
         - cd $TRAVIS_BUILD_DIR
-        - gzip $TRAVIS_BUILD_DIR/build_log
-        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
+        - gzip -r wheels
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_310
@@ -132,11 +132,11 @@ jobs:
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_311/variable.sh
         - cd wheels_cache_311
         - sudo chown travis:travis -R .
-        - ls -lt
+        - ls -ltr
         - echo $TRAVIS_BUILD_DIR
         - cd $TRAVIS_BUILD_DIR
-        - gzip $TRAVIS_BUILD_DIR/build_log
-        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
+        - gzip -r wheels
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_311
@@ -158,11 +158,12 @@ jobs:
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_312/variable.sh
         - cd wheels_cache_312
         - sudo chown travis:travis -R .
-        - ls -lt
+        - ls -ltr
         - echo $TRAVIS_BUILD_DIR
         - cd $TRAVIS_BUILD_DIR
         - gzip $TRAVIS_BUILD_DIR/build_log
-        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
+        - gzip -r wheels
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_312
@@ -187,8 +188,8 @@ jobs:
         - ls -lt
         - echo $TRAVIS_BUILD_DIR
         - cd $TRAVIS_BUILD_DIR
-        - gzip $TRAVIS_BUILD_DIR/build_log
-        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
+        - gzip -r wheels
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_313
