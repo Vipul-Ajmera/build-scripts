@@ -182,6 +182,25 @@ jobs:
         use: build_cache
       allow_failure: true
 
+    - stage: Upload created wheels
+      if: env(WHEEL_CREATION) = true
+      name: created wheels
+      workspace:
+        use: 
+          - wheels_cache_3.9
+          - wheels_cache_3.10
+          - wheels_cache_3.11
+          - wheels_cache_3.12
+          - wheels_cache_3.13
+      script:
+        - mkdir -p wheels
+        - for version in 3.9 3.10 3.11 3.12 3.13; do
+            mkdir -p wheels/$version
+            find wheels_cache_$version -name "wheels_$version" -type d -exec find {} -name '*.whl' -exec cp {} wheels/$version/ \; \;
+          done
+        - find wheels -type f
+
+      
     - stage: Source code scanner
       if: env(ENABLE_TRIVY) = true AND env(VALIDATE_BUILD_SCRIPT) = true
       name: Run trivy scan
