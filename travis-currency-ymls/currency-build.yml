@@ -85,8 +85,7 @@ jobs:
         - tar -czvf wheels_cache_39/wheels_3.9.tar.gz wheels_3.9/
         - echo "Wheels archive created: "
         - ls wheels_cache_39/
-        - gzip -r $TRAVIS_BUILD_DIR/wheels
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts_python/upload_file.sh wheels.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts_python/upload_file.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_39
