@@ -76,17 +76,22 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_39 && sudo mv variable.sh wheels_cache_39
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.9:"; ls wheels_3.9
+        - echo "Wheels created for Python 3.9:"; ls wheels/$PYTHON_VERSION/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package"  wheels_cache_39
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_39/variable.sh
         - cd  wheels_cache_39
         - sudo chown travis:travis -R .
         - ls -ltr
+        - echo $TRAVIS_BUILD_DIR
+        - cd $TRAVIS_BUILD_DIR/wheels_cache_39
+        - ls -ltr
+        - gzip -r $TRAVIS_BUILD_DIR/wheels
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts_python/upload_file.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_39
           paths:
-            - wheels_3.9
+            - wheels/
         use: build_cache
       allow_failure: true
 
@@ -98,17 +103,21 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_310 && sudo mv variable.sh wheels_cache_310
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.10:"; ls wheels_3.10
+        - echo "Wheels created for Python 3.10:"; ls wheels/$PYTHON_VERSION/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package"  wheels_cache_310
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_310/variable.sh
         - cd  wheels_cache_310
         - sudo chown travis:travis -R .
         - ls -ltr
+        - echo $TRAVIS_BUILD_DIR
+        - cd $TRAVIS_BUILD_DIR
+        - gzip -r wheels
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_310
           paths:
-            - wheels_3.10
+            - wheels/
         use: build_cache
       allow_failure: true
     
@@ -120,18 +129,21 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_311 && sudo mv variable.sh wheels_cache_311
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.11:"; ls wheels_3.11
-	- cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_311
+        - echo "Wheels created for Python 3.11:"; ls wheels/$PYTHON_VERSION/
+        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_311
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_311/variable.sh
         - cd wheels_cache_311
         - sudo chown travis:travis -R .
         - ls -ltr
-
+        #- echo $TRAVIS_BUILD_DIR
+        #- cd $TRAVIS_BUILD_DIR
+        - gzip -r wheels
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_311
           paths:
-            - wheels_3.11
+            - wheels/
         use: build_cache
       allow_failure: true
 
@@ -143,17 +155,22 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_312 && sudo mv variable.sh wheels_cache_312
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.12:"; ls wheels_3.12
+         - echo "Wheels created for Python 3.12:"; ls wheels/$PYTHON_VERSION/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_312
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_312/variable.sh
         - cd wheels_cache_312
         - sudo chown travis:travis -R .
         - ls -ltr
+        - echo $TRAVIS_BUILD_DIR
+        - cd $TRAVIS_BUILD_DIR
+        - gzip $TRAVIS_BUILD_DIR/build_log
+        - gzip -r wheels
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_312
           paths:
-            - wheels_3.12
+            - wheels/
         use: build_cache
       allow_failure: true
 
@@ -165,34 +182,23 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_313 && sudo mv variable.sh wheels_cache_313
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.13:"; ls wheels_3.9
-	- cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package"  wheels_cache_313
+        - echo "Wheels created for Python 3.13:"; ls wheels/$PYTHON_VERSION/
+        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package"  wheels_cache_313
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_313/variable.sh
         - cd  wheels_cache_313
         - sudo chown travis:travis -R .
         - ls -ltr
+        - echo $TRAVIS_BUILD_DIR
+        - cd $TRAVIS_BUILD_DIR
+        - gzip -r wheels
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_313
           paths:
-            - wheels_3.13
+            - wheels/
         use: build_cache
       allow_failure: true
-	  
-    - stage: Upload created wheels
-      if: env(WHEEL_CREATION) = true
-      name: created wheels 
-      workspaces:
-        use:
-          - wheels_cache_39
-          - wheels_cache_310
-          - wheels_cache_311
-		  - wheels_cache_312
-		  - wheels_cache_313
-      script:
-	    #create the main wheels dir
-        - mkdir wheels 
-        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh source_scanner.tar.gz	
 
     - stage: Source code scanner
       if: env(ENABLE_TRIVY) = true AND env(VALIDATE_BUILD_SCRIPT) = true
