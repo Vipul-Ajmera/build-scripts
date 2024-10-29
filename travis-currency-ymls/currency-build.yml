@@ -72,23 +72,15 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_39 && sudo mv variable.sh wheels_cache_39
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.9:"; ls wheels_3.9
-        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package"  wheels_cache_39
-        - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_39/variable.sh
-        - cd  wheels_cache_39
-        - sudo chown travis:travis -R .
-        - ls -ltr
-        - echo $TRAVIS_BUILD_DIR
-        - cd $TRAVIS_BUILD_DIR
-        - ls -ltr
-        #- gzip -r $TRAVIS_BUILD_DIR/wheels_cache_39/wheels_3.9
-        #- ls -ltr
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.9.gz
+        - echo "Wheels created for Python 3.9:"; ls wheels_3.9/
+        - gzip wheels_cache_39/wheels_3.9.tar.gz wheels_3.9
+        - echo "Wheels archive created:"; ls wheels_cache_39/
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.9.gz
       workspaces:
         create:
           name: wheels_cache_39
           paths:
-            - wheels_3.9
+            - wheels_3.9/
         use: build_cache
       allow_failure: true
 
