@@ -85,7 +85,7 @@ jobs:
         # tar czvf wheels_3.9.tar.gz wheels_3.9/
         # echo "Wheels archive created: "
         #- ls wheels_cache_39/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts_python/upload_file.sh wheels.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts_python/upload_file.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_39
@@ -108,12 +108,12 @@ jobs:
         - cd  wheels_cache_310
         - sudo chown travis:travis -R .
         - ls -ltr
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_310
           paths:
-            - wheels/
+            - wheels_3.10/
         use: build_cache
       allow_failure: true
     
@@ -136,7 +136,7 @@ jobs:
         create:
           name: wheels_cache_311
           paths:
-            - wheels/
+            - wheels_3.11/
         use: build_cache
       allow_failure: true
 
@@ -159,7 +159,7 @@ jobs:
         create:
           name: wheels_cache_312
           paths:
-            - wheels/
+            - wheels_3.12/
         use: build_cache
       allow_failure: true
 
@@ -182,7 +182,7 @@ jobs:
         create:
           name: wheels_cache_313
           paths:
-            - wheels/
+            - wheels_3.13/
         use: build_cache
       allow_failure: true
 
