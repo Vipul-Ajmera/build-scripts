@@ -91,7 +91,11 @@ jobs:
       script:
         - source variable.sh
         - mkdir wheels_cache_310
-        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - chmod +x ./script/build_package_python.sh 
+        - while true; do echo "still building..."; sleep 300; done &
+        - BUILD_LOG_PID=$!
+        - bash ./script/build_package_python.sh;
+        - kill BUILD_LOG_PID=$!
         - echo "Wheels created for Python 3.10:"; ls wheels_3.10/
         - ls -ltr
         - tar czvf wheels_3.10.tar.gz wheels_3.10
