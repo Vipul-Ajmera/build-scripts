@@ -82,6 +82,7 @@ jobs:
         - cd $TRAVIS_BUILD_DIR/wheels_cache_39/
         - ls -ltr
         - gzip -r $TRAVIS_BUILD_DIR/wheels_cache_39/wheels_3.9
+        - ls -ltr
         - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.9.gz
       workspaces:
         create:
