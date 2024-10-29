@@ -6,7 +6,7 @@ token_request=$(curl -X POST https://iam.cloud.ibm.com/identity/token \
   -d "grant_type=urn%3Aibm%3Aparams%3Aoauth%3Agrant-type%3Aapikey&apikey=$currency_ecosystem_dev_service_api_key")
 
 #token=$(echo "$token_request" | jq -r '.access_token')
-#curl -X PUT -H "Authorization: bearer $token" -H "Content-Type: application/gzip" -T $1 "https://s3.au-syd.cloud-object-storage.appdomain.cloud/currency-automation-toolci-bucket/$PACKAGE_NAME/$VERSION/$1"
+#curl -X PUT -H "Authorization: bearer $token" -H "Content-Type: application/x-tar" -T $1 "https://s3.au-syd.cloud-object-storage.appdomain.cloud/currency-automation-toolci-bucket/$PACKAGE_NAME/$VERSION/$1"
 
 # Check if the token request was successful based on the presence of 'errorCode'
 if [[ $(echo "$token_request" | jq -r '.errorCode') == "null" ]]; then
