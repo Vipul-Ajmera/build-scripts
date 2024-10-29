@@ -81,10 +81,10 @@ jobs:
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_39/variable.sh
         - cd  wheels_cache_39
         - sudo chown travis:travis -R .
-        - ls -ltr
-        - tar czvf wheels_3.9.tar.gz wheels_3.9/
-        - echo "Wheels archive created: "
-        - ls wheels_cache_39/
+        # ls -ltr
+        # tar czvf wheels_3.9.tar.gz wheels_3.9/
+        # echo "Wheels archive created: "
+        #- ls wheels_cache_39/
         - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts_python/upload_file.sh wheels.gz
       workspaces:
         create:
@@ -102,15 +102,12 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_310 && sudo mv variable.sh wheels_cache_310
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.10:"; ls wheels/$PYTHON_VERSION/
+        - echo "Wheels created for Python 3.10:"; ls wheels_$PYTHON_VERSION/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package"  wheels_cache_310
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >>  wheels_cache_310/variable.sh
         - cd  wheels_cache_310
         - sudo chown travis:travis -R .
         - ls -ltr
-        - echo $TRAVIS_BUILD_DIR
-        - cd $TRAVIS_BUILD_DIR
-        - gzip -r wheels
         - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
@@ -128,16 +125,13 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_311 && sudo mv variable.sh wheels_cache_311
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.11:"; ls wheels/$PYTHON_VERSION/
+        - echo "Wheels created for Python 3.11:"; ls wheels_$PYTHON_VERSION/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_311
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_311/variable.sh
         - cd wheels_cache_311
         - sudo chown travis:travis -R .
         - ls -ltr
-        #- echo $TRAVIS_BUILD_DIR
-        #- cd $TRAVIS_BUILD_DIR
-        - gzip -r wheels
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_311
@@ -154,17 +148,13 @@ jobs:
         - source variable.sh
         - mkdir wheels_cache_312 && sudo mv variable.sh wheels_cache_312
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-         - echo "Wheels created for Python 3.12:"; ls wheels/$PYTHON_VERSION/
+         - echo "Wheels created for Python 3.12:"; ls wheels_$PYTHON_VERSION/
         - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_312
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_312/variable.sh
         - cd wheels_cache_312
         - sudo chown travis:travis -R .
         - ls -ltr
-        - echo $TRAVIS_BUILD_DIR
-        - cd $TRAVIS_BUILD_DIR
-        - gzip $TRAVIS_BUILD_DIR/build_log
-        - gzip -r wheels
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_312
@@ -187,10 +177,7 @@ jobs:
         - cd  wheels_cache_313
         - sudo chown travis:travis -R .
         - ls -ltr
-        - echo $TRAVIS_BUILD_DIR
-        - cd $TRAVIS_BUILD_DIR
-        - gzip -r wheels
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels.gz
       workspaces:
         create:
           name: wheels_cache_313
