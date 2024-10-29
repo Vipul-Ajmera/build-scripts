@@ -73,9 +73,9 @@ jobs:
         - mkdir wheels_cache_39 && sudo mv variable.sh wheels_cache_39
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - echo "Wheels created for Python 3.9:"; ls wheels_3.9/
-        - gzip wheels_3.9
+        - tar czvf wheels_cache_39/wheels_3.9.tar.gz wheels_3.9
         - echo "Wheels archive created:"; ls wheels_cache_39/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.9.gz
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.9.tar.gz
       workspaces:
         create:
           name: wheels_cache_39
@@ -90,12 +90,9 @@ jobs:
       env: PYTHON_VERSION="3.10"
       script:
         - source variable.sh
-        - mkdir wheels_cache_310
-        - chmod +x ./script/build_package_python.sh 
-        - while true; do echo "still building..."; sleep 300; done &
-        - BUILD_LOG_PID=$!
-        - bash ./script/build_package_python.sh;
-        - kill BUILD_LOG_PID=$!
+        - mkdir wheels_cache_310 && sudo mv variable.sh wheels_cache_310
+        - chmod +x ./script/build_package_python.sh
+        - travis_wait 30 bash ./script/build_package_python.sh
         - echo "Wheels created for Python 3.10:"; ls wheels_3.10/
         - ls -ltr
         - tar czvf wheels_cache_310/wheels_3.10.tar.gz wheels_3.10
@@ -108,7 +105,7 @@ jobs:
             - wheels_3.10/
         use: build_cache
       allow_failure: true
-
+      
     - stage: Wheel Creation
       if: env(WHEEL_CREATION) = true
       name: "Create Wheel for Python 3.11"
