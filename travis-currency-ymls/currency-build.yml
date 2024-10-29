@@ -79,16 +79,16 @@ jobs:
         - sudo chown travis:travis -R .
         - ls -ltr
         - echo $TRAVIS_BUILD_DIR
-        - cd $TRAVIS_BUILD_DIR/wheels_cache_39/
+        - cd $TRAVIS_BUILD_DIR
         - ls -ltr
-        - gzip -r $TRAVIS_BUILD_DIR/wheels_cache_39/wheels_3.9
-        - ls -ltr
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.9.gz
+        #- gzip -r $TRAVIS_BUILD_DIR/wheels_cache_39/wheels_3.9
+        #- ls -ltr
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.9.gz
       workspaces:
         create:
           name: wheels_cache_39
           paths:
-            - wheels/
+            - .
         use: build_cache
       allow_failure: true
 
