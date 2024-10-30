@@ -75,7 +75,7 @@ jobs:
         - echo "Wheels created for Python 3.9:"; ls wheels_3.9/
         - tar czvf wheels_cache_39/wheels_3.9.tar.gz wheels_3.9
         - echo "Wheels archive created:"; ls wheels_cache_39/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.9.tar.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.9.tar.gz
       workspaces:
         create:
           name: wheels_cache_39
@@ -97,7 +97,7 @@ jobs:
         - ls -ltr
         - tar czvf wheels_cache_310/wheels_3.10.tar.gz wheels_3.10
         - echo "Wheels archive created:"; ls wheels_cache_310/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.10.tar.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.10.tar.gz
       workspaces:
         create:
           name: wheels_cache_310
@@ -118,7 +118,7 @@ jobs:
         - ls -ltr
         - tar czvf wheels_cache_311/wheels_3.11.tar.gz wheels_3.11
         - echo "Wheels archive created:"; ls wheels_cache_311/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.11.tar.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.11.tar.gz
       workspaces:
         create:
           name: wheels_cache_311
@@ -134,13 +134,12 @@ jobs:
       script:
         - source variable.sh
         - mkdir wheels_cache_312
-        - chmod +x ./script/build_package_python.sh
-        - travis_wait 30 bash ./script/build_package_python.sh
+        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - echo "Wheels created for Python 3.12:"; ls wheels_3.12/
         - ls -ltr
         - tar czvf wheels_cache_312/wheels_3.12.tar.gz wheels_3.12
         - echo "Wheels archive created:"; ls wheels_cache_312/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.12.tar.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.12.tar.gz
       workspaces:
         create:
           name: wheels_cache_312
@@ -156,12 +155,13 @@ jobs:
       script:
         - source variable.sh
         - mkdir wheels_cache_313
-        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - chmod +x ./script/build_package_python.sh
+        - travis_wait 30 bash ./script/build_package_python.sh
         - echo "Wheels created for Python 3.13:"; ls wheels_3.13/
         - ls -ltr
         - tar czvf wheels_cache_313/wheels_3.13.tar.gz wheels_3.13
         - echo "Wheels archive created:"; ls wheels_cache_313/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.13.tar.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.13.tar.gz
       workspaces:
         create:
           name: wheels_cache_313
