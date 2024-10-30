@@ -159,9 +159,9 @@ jobs:
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - echo "Wheels created for Python 3.13:"; ls wheels_3.13/
         - ls -ltr
-        - tar czvf wheels_3.13.tar.gz wheels_3.13
+        - tar czvf wheels_cache_313/wheels_3.13.tar.gz wheels_3.13
         - echo "Wheels archive created:"; ls wheels_cache_313/
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.13.tar.gz
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.13.tar.gz
       workspaces:
         create:
           name: wheels_cache_313
