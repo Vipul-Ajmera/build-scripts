@@ -106,7 +106,9 @@ jobs:
         - cd $TRAVIS_BUILD_DIR/wheels_cache_310
         - ls -ltr
         - tar czvf $TRAVIS_BUILD_DIR/wheels_cache_310/wheels_3.10.tar.gz wheels_3.10
-        - echo "Checking the tar file:"; ls -ltr wheels_cache_39
+        - echo "Checking the tar file:"
+        - cd $TRAVIS_BUILD_DIR/wheels_cache_310
+        - ls -ltr
         #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_39/wheels_3.9.tar.gz
       workspaces:
         create:
