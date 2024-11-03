@@ -90,19 +90,30 @@ jobs:
       env: PYTHON_VERSION="3.10"
       script:
         - source variable.sh
+        # creating a folder package-cache to store the variable.sh and wheel package folder
         - mkdir wheels_cache_310 && sudo mv variable.sh wheels_cache_310
-        - chmod +x ./script/build_package_python.sh
-        - travis_wait 60 bash ./script/build_package_python.sh
+        - chmod +x ./script/build_package.sh; bash ./script/build_package.sh;
         - echo "Wheels created for Python 3.10:"; ls wheels_3.10/
+        # setting a variable cloned_package,the value of the variable is based on recently cloned package through build-script execution.
+        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_310
+        - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_310/variable.sh
+        - cd wheels_cache_310
+        # changing the ownership of package-cache and it's sub directories to travis, the reason for doing that is to facilitate creation of files
+        # in the cloned package folder(note: currently cloned package folder is owned by the root)
+        - sudo chown travis:travis -R .
         - ls -ltr
-        - tar czvf wheels_cache_310/wheels_3.10.tar.gz wheels_3.10
-        - echo "Wheels archive created:"; ls wheels_cache_310/
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.10.tar.gz
+        # executing pre-process script which creates some files based on the package language.(python, javascript, typescript)
+        - chmod +x ../script/pre_process.sh; bash ../script/pre_process.sh;
+        - echo $TRAVIS_BUILD_DIR
+        - cd $TRAVIS_BUILD_DIR
+        - tar czvf wheels_cache_39/wheels_3.10.tar.gz wheels_3.10
+        - echo "Checking the tar file:"; ls -lh wheels_cache_39/wheels_3.10.tar.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_39/wheels_3.9.tar.gz
       workspaces:
         create:
           name: wheels_cache_310
           paths:
-            - wheels_3.10/
+            - .
         use: build_cache
       allow_failure: true
       
