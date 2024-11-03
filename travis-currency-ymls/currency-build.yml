@@ -154,6 +154,7 @@ jobs:
       env: PYTHON_VERSION="3.13"
       script:
         - source variable.sh
+        - while true; do echo "Keeping alive..."; sleep 60; done &
         - mkdir wheels_cache_313
         - chmod +x ./script/build_package_python.sh
         - travis_wait 90 bash ./script/build_package_python.sh
