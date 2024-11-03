@@ -1,3 +1,4 @@
+
 os: linux
 dist: focal
 arch: ppc64le
@@ -70,12 +71,12 @@ jobs:
       env: PYTHON_VERSION="3.9"
       script:
         - source variable.sh
-        - mkdir wheels_cache_39 && sudo mv variable.sh wheels_cache_39
+        - mkdir wheels_cache_39 
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - echo "Wheels created for Python 3.9:"; ls wheels_3.9/
         - tar czvf wheels_cache_39/wheels_3.9.tar.gz wheels_3.9
-        - echo "Checking the tar file:"; ls -lh wheels_cache_39/wheels_3.9.tar.gz
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_39/wheels_3.9.tar.gz
+        - echo "Checking the tar file:"; ls wheels_cache_39/
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_39/wheels_3.9.tar.gz
       workspaces:
         create:
           name: wheels_cache_39
@@ -84,53 +85,37 @@ jobs:
         use: build_cache
       allow_failure: true
 
-    - stage: Wheel Creation
+    - name: "Create Wheel for Python 3.10"
       if: env(WHEEL_CREATION) = true
-      name: "Create Wheel for Python 3.10"
       env: PYTHON_VERSION="3.10"
       script:
         - source variable.sh
-        # creating a folder package-cache to store the variable.sh and wheel package folder
-        - mkdir wheels_cache_310 && sudo mv variable.sh wheels_cache_310
-        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - mkdir wheels_cache_310 
+        - chmod +x ./script/build_package_python.sh
+        - travis_wait 60 bash ./script/build_package_python.sh
         - echo "Wheels created for Python 3.10:"; ls wheels_3.10/
-        # setting a variable cloned_package,the value of the variable is based on recently cloned package through build-script execution.
-        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_310
-        - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_310/variable.sh
-        - cd wheels_cache_310
-        # changing the ownership of package-cache and it's sub directories to travis, the reason for doing that is to facilitate creation of files
-        # in the cloned package folder(note: currently cloned package folder is owned by the root)
-        - sudo chown travis:travis -R .
-        - ls -ltr
-        - echo $TRAVIS_BUILD_DIR
-        - cd $TRAVIS_BUILD_DIR/wheels_cache_310
-        - ls -ltr
-        - tar czvf $TRAVIS_BUILD_DIR/wheels_cache_310/wheels_3.10.tar.gz wheels_3.10
-        - echo "Checking the tar file:"
-        - cd $TRAVIS_BUILD_DIR/wheels_cache_310
-        - ls -ltr
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_39/wheels_3.9.tar.gz
+        - tar czvf wheels_cache_310/wheels_3.10.tar.gz wheels_3.10
+        - echo "Checking the tar file:"; ls wheels_cache_310/
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_310/wheels_3.10.tar.gz
       workspaces:
         create:
           name: wheels_cache_310
           paths:
-            - .
+            - wheels_3.10/
         use: build_cache
       allow_failure: true
       
-    - stage: Wheel Creation
+    - name: "Create Wheel for Python 3.11"
       if: env(WHEEL_CREATION) = true
-      name: "Create Wheel for Python 3.11"
       env: PYTHON_VERSION="3.11"
       script:
         - source variable.sh
         - mkdir wheels_cache_311
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - echo "Wheels created for Python 3.11:"; ls wheels_3.11/
-        - ls -ltr
         - tar czvf wheels_cache_311/wheels_3.11.tar.gz wheels_3.11
-        - echo "Wheels archive created:"; ls wheels_cache_311/
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.11.tar.gz
+        - echo "Checking the tar file:"; ls wheels_cache_39/
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_311/wheels_3.11.tar.gz
       workspaces:
         create:
           name: wheels_cache_311
@@ -139,19 +124,17 @@ jobs:
         use: build_cache
       allow_failure: true
 
-    - stage: Wheel Creation
+    - name: "Create Wheel for Python 3.12"
       if: env(WHEEL_CREATION) = true
-      name: "Create Wheel for Python 3.12"
       env: PYTHON_VERSION="3.12"
       script:
         - source variable.sh
         - mkdir wheels_cache_312
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - echo "Wheels created for Python 3.12:"; ls wheels_3.12/
-        - ls -ltr
         - tar czvf wheels_cache_312/wheels_3.12.tar.gz wheels_3.12
-        - echo "Wheels archive created:"; ls wheels_cache_312/
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.12.tar.gz
+        - echo "Checking the tar file:"; ls wheels_cache_312/
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_312/wheels_3.12.tar.gz 
       workspaces:
         create:
           name: wheels_cache_312
@@ -160,37 +143,23 @@ jobs:
         use: build_cache
       allow_failure: true
 
-    - stage: Wheel Creation
+    - name: "Create Wheel for Python 3.13"
       if: env(WHEEL_CREATION) = true
-      name: "Create Wheel for Python 3.13"
       env: PYTHON_VERSION="3.13"
       script:
         - source variable.sh
-        # creating a folder package-cache to store the variable.sh and wheel package folder
-        - mkdir wheels_cache_313 && sudo mv variable.sh wheels_cache_313
-        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - travis_wait mkdir wheels_cache_313
+        - travis_wait chmod +x ./script/build_package_python.sh; 
+        - travis_wait 60 bash ./script/build_package_python.sh;
         - echo "Wheels created for Python 3.13:"; ls wheels_3.13/
-        # setting a variable cloned_package,the value of the variable is based on recently cloned package through build-script execution.
-        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_313
-        - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_313/variable.sh
-        - cd wheels_cache_313
-        # changing the ownership of package-cache and it's sub directories to travis, the reason for doing that is to facilitate creation of files
-        # in the cloned package folder(note: currently cloned package folder is owned by the root)
-        - sudo chown travis:travis -R .
-        - ls -ltr
-        - echo $TRAVIS_BUILD_DIR
-        - cd $TRAVIS_BUILD_DIR/wheels_cache_313
-        - ls -ltr
-        - tar czvf $TRAVIS_BUILD_DIR/wheels_cache_313/wheels_3.13.tar.gz wheels_3.13
-        - echo "Checking the tar file:"
-        - cd $TRAVIS_BUILD_DIR/wheels_cache_313
-        - ls -ltr
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_39/wheels_3.9.tar.gz
+        - tar czvf wheels_cache_313/wheels_3.13.tar.gz wheels_3.13
+        - echo "Checking the tar file:"; ls wheels_cache_313/
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_313/wheels_3.13.tar.gz 
       workspaces:
         create:
           name: wheels_cache_313
           paths:
-            - .
+            - wheels_3.13/
         use: build_cache
       allow_failure: true
       
