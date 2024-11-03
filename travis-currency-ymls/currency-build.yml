@@ -102,13 +102,11 @@ jobs:
         # in the cloned package folder(note: currently cloned package folder is owned by the root)
         - sudo chown travis:travis -R .
         - ls -ltr
-        # executing pre-process script which creates some files based on the package language.(python, javascript, typescript)
-        - chmod +x ../script/pre_process.sh; bash ../script/pre_process.sh;
         - echo $TRAVIS_BUILD_DIR
         - cd $TRAVIS_BUILD_DIR/wheels_cache_310
         - ls -ltr
         - tar czvf $TRAVIS_BUILD_DIR/wheels_cache_310/wheels_3.10.tar.gz wheels_3.10
-        - echo "Checking the tar file:"; ls -lh $TRAVIS_BUILD_DIR/wheels_cache_39/wheels_3.10.tar.gz
+        - echo "Checking the tar file:"; ls $TRAVIS_BUILD_DIR/wheels_cache_39
         #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_39/wheels_3.9.tar.gz
       workspaces:
         create:
