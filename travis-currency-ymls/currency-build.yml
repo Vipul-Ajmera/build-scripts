@@ -165,23 +165,35 @@ jobs:
       name: "Create Wheel for Python 3.13"
       env: PYTHON_VERSION="3.13"
       script:
-        - travis_wait 90
         - source variable.sh
+        # creating a folder package-cache to store the variable.sh and wheel package folder
         - mkdir wheels_cache_313 && sudo mv variable.sh wheels_cache_313
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - echo "Wheels created for Python 3.13:"; ls wheels_3.13/
+        # setting a variable cloned_package,the value of the variable is based on recently cloned package through build-script execution.
+        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" wheels_cache_313
+        - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> wheels_cache_313/variable.sh
+        - cd wheels_cache_313
+        # changing the ownership of package-cache and it's sub directories to travis, the reason for doing that is to facilitate creation of files
+        # in the cloned package folder(note: currently cloned package folder is owned by the root)
+        - sudo chown travis:travis -R .
         - ls -ltr
-        - tar czvf wheels_cache_313/wheels_3.13.tar.gz wheels_3.13
-        - echo "Wheels archive created:"; ls wheels_cache_313/
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.13.tar.gz
+        - echo $TRAVIS_BUILD_DIR
+        - cd $TRAVIS_BUILD_DIR/wheels_cache_313
+        - ls -ltr
+        - tar czvf $TRAVIS_BUILD_DIR/wheels_cache_313/wheels_3.13.tar.gz wheels_3.13
+        - echo "Checking the tar file:"
+        - cd $TRAVIS_BUILD_DIR/wheels_cache_313
+        - ls -ltr
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_39/wheels_3.9.tar.gz
       workspaces:
         create:
           name: wheels_cache_313
           paths:
-            - wheels_3.13/
+            - .
         use: build_cache
       allow_failure: true
-
+      
     - stage: Source code scanner
       if: env(ENABLE_TRIVY) = true AND env(VALIDATE_BUILD_SCRIPT) = true
       name: Run trivy scan
