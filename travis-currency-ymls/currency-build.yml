@@ -76,7 +76,7 @@ jobs:
         - echo "Wheels created for Python 3.9:"; ls wheels_3.9/
         - tar czvf wheels_cache_39/wheels_3.9.tar.gz wheels_3.9
         - echo "Checking the tar file:"; ls wheels_cache_39/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_39/wheels_3.9.tar.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_39/wheels_3.9.tar.gz
       workspaces:
         create:
           name: wheels_cache_39
@@ -96,7 +96,7 @@ jobs:
         - echo "Wheels created for Python 3.10:"; ls wheels_3.10/
         - tar czvf wheels_cache_310/wheels_3.10.tar.gz wheels_3.10
         - echo "Checking the tar file:"; ls wheels_cache_310/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_310/wheels_3.10.tar.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_310/wheels_3.10.tar.gz
       workspaces:
         create:
           name: wheels_cache_310
@@ -115,7 +115,7 @@ jobs:
         - echo "Wheels created for Python 3.11:"; ls wheels_3.11/
         - tar czvf wheels_cache_311/wheels_3.11.tar.gz wheels_3.11
         - echo "Checking the tar file:"; ls wheels_cache_311/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_311/wheels_3.11.tar.gz
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_311/wheels_3.11.tar.gz
       workspaces:
         create:
           name: wheels_cache_311
@@ -134,7 +134,7 @@ jobs:
         - echo "Wheels created for Python 3.12:"; ls wheels_3.12/
         - tar czvf wheels_cache_312/wheels_3.12.tar.gz wheels_3.12
         - echo "Checking the tar file:"; ls wheels_cache_312/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_312/wheels_3.12.tar.gz 
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_312/wheels_3.12.tar.gz 
       workspaces:
         create:
           name: wheels_cache_312
@@ -157,7 +157,7 @@ jobs:
         - tar czvf wheels_cache_313/wheels_3.13.tar.gz wheels_3.13
         - echo "Checking the tar file:"; ls wheels_cache_313/
         - chmod +x ./script/upload-scripts/upload_file_python.sh
-        - bash ./script/upload-scripts/upload_file_python.sh wheels_cache_313/wheels_3.13.tar.gz
+        #- bash ./script/upload-scripts/upload_file_python.sh wheels_cache_313/wheels_3.13.tar.gz
       workspaces:
         create:
           name: wheels_cache_313
