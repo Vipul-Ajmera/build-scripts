@@ -40,7 +40,6 @@ install_python_version() {
             tar xzf Python-3.10.8.tgz
             cd Python-3.10.8
             ./configure --prefix=/usr/local --enable-optimizations 
-            make -j ${nproc}
             make altinstall
             cd .. && rm -rf Python-3.10.8.tgz
         fi
