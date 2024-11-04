@@ -13,6 +13,8 @@ else
     TEMP_BUILD_SCRIPT_PATH=""
 fi
 
+yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
+
 # Function to install a specific Python version
 install_python_version() {
     local version=$1
@@ -21,25 +23,15 @@ install_python_version() {
         yum install -y python${version} python${version}-devel python${version}-pip
         ;;
     "3.10")
-        yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
         if ! python3.10 --version &>/dev/null; then
-            cd /usr/src &&
-                wget https://www.python.org/ftp/python/3.10.14/Python-3.10.14.tgz &&
-                tar xzf Python-3.10.14.tgz &&
-                cd Python-3.10.14 &&
-                ./configure --enable-optimizations &&
-                make altinstall &&
-                ln -s /usr/local/bin/python3.10 /usr/bin/python3.10 &&
-                cd /usr/src &&
-                rm -rf Python-3.10.14.tgz Python-3.10.14
+            wget https://www.python.org/ftp/python/3.10.8/Python-3.10.8.tgz
+            tar xzf Python-3.10.8.tgz
+            cd Python-3.10.8
+            ./configure --prefix=/usr/local --enable-optimizations
+            make -j ${nproc}
+            make altinstall
+            cd .. && rm Python-3.10.8.tgz
         fi
-        # Manually install pip if it's not installed
-        if ! python3.10 -m pip --version; then
-            wget https://bootstrap.pypa.io/get-pip.py &&
-                python3.10 get-pip.py &&
-                rm get-pip.py
-        fi
-        cd "$CURRENT_DIR"
         ;;
     "3.11")
         yum install -y python${version} python${version}-devel python${version}-pip
@@ -48,34 +40,16 @@ install_python_version() {
         yum install -y python${version} python${version}-devel python${version}-pip
         ;;
     "3.13")
-        echo "Installing required dependencies for building python..."
-        yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
-        echo "Dependencies installed..."
         if ! python3.13 --version &>/dev/null; then
             echo "Now installing python3.13..."
-            cd /usr/src &&
-                wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0rc1.tgz &&
-                tar xzf Python-3.13.0rc1.tgz &&
-                cd Python-3.13.0rc1 &&
-                ./configure --enable-optimizations &&
-                make altinstall &&
-                echo "linking python3.13"
-                ln -s /usr/local/bin/python3.13 /usr/bin/python3.13 &&
-                ln -s /usr/local/bin/pip3.13 /usr/bin/pip3.13 &&
-                cd /usr/src &&
-                echo "Removing unnecessary things..."
-            rm -rf Python-3.13.0rc1.tgz Python-3.13.0rc1
+            wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0rc1.tgz
+            tar xzf Python-3.13.0rc1.tgz
+            cd Python-3.13.0rc1
+            ./configure --prefix=/usr/local --enable-optimizations
+            make -j ${nproc}
+            make altinstall
+            cd .. && rm Python-3.13.0rc1.tgz
         fi
-        echo "Python3.13 installation completed..."
-        # Manually install pip if it's not installed
-        if ! python3.13 -m pip --version; then
-            echo "Installing pip..."
-            wget https://bootstrap.pypa.io/get-pip.py &&
-                python3.13 get-pip.py &&
-                rm get-pip.py
-        fi
-        echo "Pip installation completed..."
-        cd "$CURRENT_DIR"
         ;;
     *)
         echo "Unsupported Python version: $version"
@@ -139,6 +113,7 @@ if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then # Check if TEMP_BUILD_SCRIPT_PATH is n
     package_name=$(grep -oP '(?<=^PACKAGE_NAME=).*' "$TEMP_BUILD_SCRIPT_PATH" | tr -d '"')
 
     python"$PYTHON_VERSION" -m pip install --upgrade pip setuptools wheel build pytest nox tox
+
     sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS
 else
     echo "No build script to run, skipping execution."
