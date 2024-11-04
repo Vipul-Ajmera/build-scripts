@@ -94,7 +94,7 @@ jobs:
         - chmod +x ./script/build_package_python.sh
         - bash ./script/build_package_python.sh &
         - BUILD_PID=$!
-        - while kill -0 $BUILD_PID; do echo "Building wheels for Python 3.10..."; sleep 30; done
+        - while kill -0 $BUILD_PID; do echo "Building wheels for Python 3.10..."; sleep 10; done
         - echo "Wheels created for Python 3.10:"; ls wheels_3.10/
         - tar czvf wheels_cache_310/wheels_3.10.tar.gz wheels_3.10
         - echo "Checking the tar file:"; ls wheels_cache_310/
@@ -150,7 +150,8 @@ jobs:
       env: PYTHON_VERSION="3.13"
       script:
         - source variable.sh
-        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - chmod +x ./script/build_package_python.sh
+        - travis_wait 90 bash ./script/build_package_python.sh
         - echo "Wheels created for Python 3.13:"; ls wheels_3.13/
         - tar czvf wheels_cache_313/wheels_3.13.tar.gz wheels_3.13
         - echo "Checking the tar file:"; ls wheels_cache_313/
