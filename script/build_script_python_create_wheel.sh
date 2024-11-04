@@ -1,5 +1,17 @@
 set -e
 
+# Start a heartbeat in the background to keep Travis CI from timing out
+keep_alive() {
+    while true; do
+        echo "Still building... please wait."
+        sleep 100  
+    done
+}
+
+# Start the heartbeat in the background and save its PID
+keep_alive &
+HEARTBEAT_PID=$!
+
 #variables
 PYTHON_VERSION=$1
 BUILD_SCRIPT_PATH=${2:-""} # its the build_script for the package
