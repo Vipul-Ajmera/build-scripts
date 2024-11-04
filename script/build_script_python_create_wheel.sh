@@ -6,6 +6,18 @@ BUILD_SCRIPT_PATH=${2:-""} # its the build_script for the package
 EXTRA_ARGS="${@:4}"        # Capture all additional arguments passed to the script
 CURRENT_DIR="${PWD}"       # Current directory
 
+# Start a heartbeat in the background to keep Travis CI from timing out
+keep_alive() {
+    while true; do
+        echo "Still building... please wait."
+        sleep 100  
+    done
+}
+ 
+# Start the heartbeat in the background and save its PID
+keep_alive &
+HEARTBEAT_PID=$!
+
 #If a build script is provided, create a temporary copy for modification
 if [ -n "$BUILD_SCRIPT_PATH" ]; then
     TEMP_BUILD_SCRIPT_PATH="temp_build_script.sh"
@@ -143,6 +155,9 @@ fi
 
 # Clean up the virtual environment
 cleanup "$VENV_DIR"
+
+# Stop the heartbeat process now that the build has completed
+kill $HEARTBEAT_PID
 
 echo "Build and wheel creation completed successfully."
 [ -n "$TEMP_BUILD_SCRIPT_PATH" ] && rm "$CURRENT_DIR/$TEMP_BUILD_SCRIPT_PATH"
