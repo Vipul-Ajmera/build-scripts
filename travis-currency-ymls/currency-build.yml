@@ -1,187 +1,307 @@
-set -e
 
-#variables
-PYTHON_VERSION=$1
-BUILD_SCRIPT_PATH=${2:-""} # its the build_script for the package
-EXTRA_ARGS="${@:4}"        # Capture all additional arguments passed to the script
-CURRENT_DIR="${PWD}"       # Current directory
+os: linux
+dist: focal
+arch: ppc64le
+language: shell
 
-#If a build script is provided, create a temporary copy for modification
-if [ -n "$BUILD_SCRIPT_PATH" ]; then
-    TEMP_BUILD_SCRIPT_PATH="temp_build_script.sh"
-else
-    TEMP_BUILD_SCRIPT_PATH=""
-fi
+branches:
+  only:
+    - master
+    - python_ecosystem
 
-yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
+env:
+  global:
+    - ENABLE_TRIVY=true
+    - ENABLE_SYFT=true
+    - ENABLE_GRYPE=true
 
-# Function to install a specific Python version
-install_python_version() {
-    local version=$1
-    case $version in
-    "3.9")
-        yum install -y python${version} python${version}-devel python${version}-pip
-        ;;
-    "3.10")
-        if ! python3.10 --version &>/dev/null; then
-            wget https://www.python.org/ftp/python/3.10.8/Python-3.10.8.tgz
-            tar xzf Python-3.10.8.tgz
-            cd Python-3.10.8
-            ./configure --prefix=/usr/local --enable-optimizations
-            make -j ${nproc}
-            make altinstall
-            cd .. && rm Python-3.10.8.tgz
-        fi
-        ;;
-    "3.11")
-        yum install -y python${version} python${version}-devel python${version}-pip
-        ;;
-    "3.12")
-        yum install -y python${version} python${version}-devel python${version}-pip
-        ;;
-    "3.13")
-        if ! python3.13 --version &>/dev/null; then
-            echo "Now installing python3.13..."
-            wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0rc1.tgz
-            tar xzf Python-3.13.0rc1.tgz
-            cd Python-3.13.0rc1
-            ./configure --prefix=/usr/local --enable-optimizations
-            make -j ${nproc}
-            make altinstall
-            cd .. && rm Python-3.13.0rc1.tgz
-        fi
-        ;;
-    *)
-        echo "Unsupported Python version: $version"
-        exit 1
-        ;;
-    esac
-}
+services:
+  - docker
 
-# Function to copy and format the build script
-format_build_script() {
-    if [ -n "$BUILD_SCRIPT_PATH" ]; then
-        cp "$BUILD_SCRIPT_PATH" "$TEMP_BUILD_SCRIPT_PATH"
-        sed -i 's/pip3 /pip /g' "$TEMP_BUILD_SCRIPT_PATH"
-        sed -i 's/\bpython[0-9]\+\.[0-9]\+ -m pip /pip /g' "$TEMP_BUILD_SCRIPT_PATH"
-        sed -i '/-m venv/d' "$TEMP_BUILD_SCRIPT_PATH"
-        sed -i '/bin\/activate/d' "$TEMP_BUILD_SCRIPT_PATH"
-        sed -i '/^deactivate$/d' "$TEMP_BUILD_SCRIPT_PATH"
-        sed -i 's/python[0-9]\+\.[0-9]\+-devel//g' "$TEMP_BUILD_SCRIPT_PATH"
-        sed -i 's/python[0-9]\+\.[0-9]\+-pip//g' "$TEMP_BUILD_SCRIPT_PATH"
-        sed -i 's/python3\.[0-9]\+/python/g' "$TEMP_BUILD_SCRIPT_PATH"
-        sed -i 's/python3/python/g' "$TEMP_BUILD_SCRIPT_PATH"
-        sed -i '/yum install/{s/\<python-devel\>//g; s/\<python-pip\>//g}' "$TEMP_BUILD_SCRIPT_PATH"
-        sed -i '/yum install/{s/\<python\>//g}' "$TEMP_BUILD_SCRIPT_PATH"
-    else
-        echo "No build script specified, skipping copying."
-    fi
-}
+before_install:
+  - sudo apt install -y jq; jq --version
 
-# Function to create a virtual environment
-create_venv() {
-    local VENV_DIR=$1
-    local python_version=$2
-    "python$python_version" -m venv --system-site-packages "$VENV_DIR"
-    source "$VENV_DIR/bin/activate"
-}
+jobs:
+  include:
+    - stage: Build info
+      name: Get Build info details
+      script:
+        # This script will read build_info.sh and create variable.sh file with export statement, so that we can source this file in later stages to use variables.
+        - chmod +x ./script/read_buildinfo.sh;bash ./script/read_buildinfo.sh
+      workspaces:
+        create:
+          #need to cache file variable.sh using workspaces by the name build_cache
+          name: build_cache
+          paths:
+            - variable.sh
 
-# Function to clean up virtual environment
-cleanup() {
-    local VENV_DIR=$1
-    deactivate
-    rm -rf "$VENV_DIR"
-}
+    - stage: Build
+      if: env(VALIDATE_BUILD_SCRIPT) = true
+      name: Build script run
+      script:
+        - source variable.sh
+        # creating a folder package-cache to store the variable.sh and cloned package folder
+        - mkdir package-cache && sudo mv variable.sh package-cache
+        - chmod +x ./script/build_package.sh; bash ./script/build_package.sh;
+        # setting a variable cloned_package,the value of the variable is based on recently cloned package through build-script execution.
+        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" package-cache
+        - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> package-cache/variable.sh
+        - cd package-cache
+        # changing the ownership of package-cache and it's sub directories to travis, the reason for doing that is to facilitate creation of files
+        # in the cloned package folder(note: currently cloned package folder is owned by the root)
+        - sudo chown travis:travis -R .
+        - ls -ltr
+        # executing pre-process script which creates some files based on the package language.(python, javascript, typescript)
+        - chmod +x ../script/pre_process.sh; bash ../script/pre_process.sh;
+        - echo $TRAVIS_BUILD_DIR
+        - cd $TRAVIS_BUILD_DIR
+        - gzip $TRAVIS_BUILD_DIR/build_log
+        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh build_log.gz
+      workspaces:
+        create:
+          # package_cache contains both variable.sh file as well as cloned package directory.
+          name: package_cache
+          paths:
+            - .
+        use: build_cache
 
-# Format the build script if it's non-empty
-if [ -n "$BUILD_SCRIPT_PATH" ]; then
-    format_build_script
-fi
+    - stage: Wheel Creation
+      if: env(WHEEL_CREATION) = true
+      name: "Create Wheel for Python 3.9"
+      env: PYTHON_VERSION="3.9"
+      script:
+        - source variable.sh
+        - mkdir wheels_cache_39 
+        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - echo "Wheels created for Python 3.9:"; ls wheels_3.9/
+        - tar czvf wheels_cache_39/wheels_3.9.tar.gz wheels_3.9
+        - echo "Checking the tar file:"; ls wheels_cache_39/
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_39/wheels_3.9.tar.gz
+      workspaces:
+        create:
+          name: wheels_cache_39
+          paths:
+            - wheels_3.9/
+        use: build_cache
+      allow_failure: true
 
-# Install the specified Python version in the background and get its PID
-install_python_version "$PYTHON_VERSION" &
-PYTHON_INSTALL_PID=$!
- 
-# Monitor the Python installation process
-while ps -p $PYTHON_INSTALL_PID > /dev/null; do
-    echo "Python installation process $PYTHON_INSTALL_PID is running"
-    sleep 100
-done
- 
-# Wait for the Python installation process to complete and get its exit status
-wait $PYTHON_INSTALL_PID
-python_install_status=$?
- 
-# Check if the Python installation was successful
-if [ $python_install_status -ne 0 ]; then
-    echo "Python installation failed. Exiting."
-    exit 1
-fi
- 
-echo "Python installation completed successfully."
+    - name: "Create Wheel for Python 3.10"
+      if: env(WHEEL_CREATION) = true
+      env: PYTHON_VERSION="3.10"
+      script:
+        - source variable.sh
+        - mkdir wheels_cache_310 
+        - chmod +x ./script/build_package_python.sh
+        - travis_wait 60 bash ./script/build_package_python.sh
+        - echo "Wheels created for Python 3.10:"; ls wheels_3.10/
+        - tar czvf wheels_cache_310/wheels_3.10.tar.gz wheels_3.10
+        - echo "Checking the tar file:"; ls wheels_cache_310/
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_310/wheels_3.10.tar.gz
+      workspaces:
+        create:
+          name: wheels_cache_310
+          paths:
+            - wheels_3.10/
+        use: build_cache
+      allow_failure: true
+      
+    - name: "Create Wheel for Python 3.11"
+      if: env(WHEEL_CREATION) = true
+      env: PYTHON_VERSION="3.11"
+      script:
+        - source variable.sh
+        - mkdir wheels_cache_311
+        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - echo "Wheels created for Python 3.11:"; ls wheels_3.11/
+        - tar czvf wheels_cache_311/wheels_3.11.tar.gz wheels_3.11
+        - echo "Checking the tar file:"; ls wheels_cache_11/
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_311/wheels_3.11.tar.gz
+      workspaces:
+        create:
+          name: wheels_cache_311
+          paths:
+            - wheels_3.11/
+        use: build_cache
+      allow_failure: true
 
-# Create and activate virtual environment
-VENV_DIR="$CURRENT_DIR/pyvenv_$PYTHON_VERSION"
-create_venv "$VENV_DIR" "$PYTHON_VERSION"
+    - name: "Create Wheel for Python 3.12"
+      if: env(WHEEL_CREATION) = true
+      env: PYTHON_VERSION="3.12"
+      script:
+        - source variable.sh
+        - mkdir wheels_cache_312
+        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - echo "Wheels created for Python 3.12:"; ls wheels_3.12/
+        - tar czvf wheels_cache_312/wheels_3.12.tar.gz wheels_3.12
+        - echo "Checking the tar file:"; ls wheels_cache_312/
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_312/wheels_3.12.tar.gz 
+      workspaces:
+        create:
+          name: wheels_cache_312
+          paths:
+            - wheels_3.12/
+        use: build_cache
+      allow_failure: true
 
-echo "=============== Running package build-script starts =================="
- 
-if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then
-    # Check if TEMP_BUILD_SCRIPT_PATH is non-empty
-    package_name=$(grep -oP '(?<=^PACKAGE_NAME=).*' "$TEMP_BUILD_SCRIPT_PATH" | tr -d '"')
-    python"$PYTHON_VERSION" -m pip install --upgrade pip setuptools wheel build pytest nox tox
-    
-    # Run the build script in the background and get its PID
-    sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS &
-    SCRIPT_PID=$!
- 
-    # Monitor the script's PID
-    while ps -p $SCRIPT_PID > /dev/null; do
-        echo "Package build script $SCRIPT_PID is running"
-        sleep 100
-    done
- 
-    # Wait for the script to complete and get its exit status
-    wait $SCRIPT_PID
-    my_pid_status=$?
- 
-    # Check if the build script was successful
-    if [ $my_pid_status -ne 0 ]; then
-        echo "Build script execution failed. Exiting."
-        cleanup "$VENV_DIR"
-        exit 1
-    fi
-else
-    echo "No build script to run, skipping execution."
-fi
- 
-echo "=============== Running package build-script ends =================="
- 
-# If the build script fails, exit with an error
-if [ $? -ne 0 ]; then
-    echo "Build script execution failed. Exiting."
-    cleanup "$VENV_DIR"
-    exit 1
-fi
+    - name: "Create Wheel for Python 3.13"
+      if: env(WHEEL_CREATION) = true
+      env: PYTHON_VERSION="3.13"
+      script:
+        - source variable.sh
+        - chmod +x ./script/build_package_python.sh
+        - travis_wait 60 bash ./script/build_package_python.sh
+        - echo "Wheels created for Python 3.13:"; ls wheels_3.13/
+        - tar czvf wheels_cache_313/wheels_3.13.tar.gz wheels_3.13
+        - echo "Checking the tar file:"; ls wheels_cache_313/
+        - chmod +x ./script/upload-scripts/upload_file_python.sh
+        #- bash ./script/upload-scripts/upload_file_python.sh wheels_cache_313/wheels_3.13.tar.gz
+      workspaces:
+        create:
+          name: wheels_cache_313
+          paths:
+            - wheels_3.13/
+        use: build_cache
+      allow_failure: true
+      
+    - stage: Source code scanner
+      if: env(ENABLE_TRIVY) = true AND env(VALIDATE_BUILD_SCRIPT) = true
+      name: Run trivy scan
+      script:
+        - ls -ltr package-cache
+        - source package-cache/variable.sh;
+        - chmod +x ./script/scanner-scripts/trivy_code_scan.sh;bash ./script/scanner-scripts/trivy_code_scan.sh;
+        - mkdir source_trivy
+        - mv package-cache/trivy_source_vulnerabilities_results.json package-cache/trivy_source_sbom_results.cyclonedx source_trivy
+      workspaces:
+        create:
+          name: source_trivy
+          paths:
+            - source_trivy
+        use:
+          - package_cache
 
-echo "Navigating to the specified directory"
-cd $package_name
+    - name: Run syft scan
+      if: env(ENABLE_SYFT) = true AND env(VALIDATE_BUILD_SCRIPT) = true
+      script:
+        - source package-cache/variable.sh;
+        - chmod +x ./script/scanner-scripts/syft_code_scan.sh;bash ./script/scanner-scripts/syft_code_scan.sh;
+        - mkdir source_syft
+        - mv package-cache/syft_source_sbom_results.json source_syft
+      workspaces:
+        create:
+          name: source_syft
+          paths:
+            - source_syft
+        use:
+          - package_cache
 
-# Build the wheel
-echo ""
-echo "*****************************************************************************"
-echo "Building the wheel..."
-if ! python -m build --wheel --outdir="$CURRENT_DIR/wheels_$PYTHON_VERSION/"; then
-    echo "Wheel creation failed for Python $PYTHON_VERSION."
-    cleanup "$VENV_DIR"
-    [ -n "$TEMP_BUILD_SCRIPT_PATH" ] && rm "$CURRENT_DIR/$TEMP_BUILD_SCRIPT_PATH"
-    exit 1
-fi
+    - name: Run grype scan
+      if: env(ENABLE_GRYPE) = true AND env(VALIDATE_BUILD_SCRIPT) = true
+      script:
+        - source package-cache/variable.sh;
+        - chmod +x ./script/scanner-scripts/grype_code_scan.sh;bash ./script/scanner-scripts/grype_code_scan.sh;
+        - mkdir source_grype
+        - mv package-cache/grype_source_sbom_results.json package-cache/grype_source_vulnerabilities_results.json source_grype
+      workspaces:
+        create:
+          name: source_grype
+          paths:
+            - source_grype
+        use:
+          - package_cache
 
-# Clean up the virtual environment
-cleanup "$VENV_DIR"
+    - stage: Upload source scanner results
+      if: env(VALIDATE_BUILD_SCRIPT) = true
+      name: source scanner results
+      workspaces:
+        use:
+          - source_trivy
+          - source_syft
+          - source_grype
+      script:
+        - mkdir source
+        # the below commands will copy the files from all the scanner folders to source folder,
+        #later we tar that source folder and use the upload scanner script to push into cos bucket.
+        - find source_trivy -mindepth 1 -exec mv -t source {} + 2>/dev/null || true
+        - find source_syft -mindepth 1 -exec mv -t source {} + 2>/dev/null || true
+        - find source_grype -mindepth 1 -exec mv -t source {} + 2>/dev/null || true
+        - tar cvzf source_scanner.tar.gz source
+        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh source_scanner.tar.gz
 
-echo "Build and wheel creation completed successfully."
-[ -n "$TEMP_BUILD_SCRIPT_PATH" ] && rm "$CURRENT_DIR/$TEMP_BUILD_SCRIPT_PATH"
+    - stage: Build docker image
+      # the below condition checks if docker_build flag set to true or false, it it is true it will build this stage and if it is false it will exclude this stage.
+      if: env(BUILD_DOCKER) = true
+      name: Docker build
+      script:
+        - source variable.sh;
+        - chmod +x ./script/build_docker.sh; bash ./script/build_docker.sh;echo "printing docker images"; docker images;
+        # the below command is used to upload docker image to ibm icr registry.
+        #- chmod +x ./script/upload-scripts/upload_docker_image.sh; bash ./script/upload-scripts/upload_docker_image.sh;
+      workspaces:
+        create:
+          name: docker_image_tar
+          paths:
+            - image.tar
+        use: build_cache
 
-exit 0
+    - stage: Docker image Scanner
+      if: env(BUILD_DOCKER) = true AND env(ENABLE_TRIVY) = true
+      name: Run trivy scan
+      script:
+        - source variable.sh;
+        - docker load -i "$HOME/build/$TRAVIS_REPO_SLUG/image.tar"; chmod +x ./script/scanner-scripts/trivy_image_scan.sh;bash ./script/scanner-scripts/trivy_image_scan.sh; mkdir image_trivy; mv trivy_image_vulnerabilities_results.json trivy_image_sbom_results.cyclonedx image_trivy;
+      workspaces:
+        create:
+          name: image_trivy
+          paths:
+            - image_trivy
+        use:
+          - build_cache
+          - docker_image_tar
+
+    - name: Run syft scan
+      if: env(BUILD_DOCKER) = true AND env(ENABLE_SYFT) = true
+      script:
+        - source variable.sh;
+        - docker load -i "$HOME/build/$TRAVIS_REPO_SLUG/image.tar"; chmod +x ./script/scanner-scripts/syft_image_scan.sh;bash ./script/scanner-scripts/syft_image_scan.sh; mkdir image_syft; mv syft_image_sbom_results.json image_syft;
+      workspaces:
+        create:
+          name: image_syft
+          paths:
+            - image_syft
+        use:
+          - build_cache
+          - docker_image_tar
+
+    - name: Run grype scan
+      if: env(BUILD_DOCKER) = true AND env(ENABLE_GRYPE) = true
+      script:
+        - source variable.sh;
+        - docker load -i "$HOME/build/$TRAVIS_REPO_SLUG/image.tar"; chmod +x ./script/scanner-scripts/grype_image_scan.sh;bash ./script/scanner-scripts/grype_image_scan.sh; mkdir image_grype; mv grype_image_sbom_results.json grype_image_vulnerabilities_results.json image_grype;
+      workspaces:
+        create:
+          name: image_grype
+          paths:
+            - image_grype
+        use:
+          - build_cache
+          - docker_image_tar
+
+    - stage: Upload image scanner results
+      if: env(BUILD_DOCKER) = true
+      name: image scanner results
+      workspaces:
+        use:
+          - image_trivy
+          - image_syft
+          - image_grype
+          - build_cache
+      script:
+        - source variable.sh;
+        # the below command will copy the files from all the scanner folders to image folder, later we tar that image folder and use the upload scanner script to push into cos bucket.
+        - mkdir image
+        - find image_trivy -mindepth 1 -exec mv -t image {} + 2>/dev/null || true
+        - find image_syft -mindepth 1 -exec mv -t image {} + 2>/dev/null || true
+        - find image_grype -mindepth 1 -exec mv -t image {} + 2>/dev/null || true
+        - tar cvzf image_scanner.tar.gz image
+        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh image_scanner.tar.gz
