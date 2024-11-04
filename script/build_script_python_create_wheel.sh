@@ -1,12 +1,12 @@
 set -e
 
-#variables
+# Variables
 PYTHON_VERSION=$1
-BUILD_SCRIPT_PATH=${2:-""} # its the build_script for the package
+BUILD_SCRIPT_PATH=${2:-""} # it's the build_script for the package
 EXTRA_ARGS="${@:4}"        # Capture all additional arguments passed to the script
 CURRENT_DIR="${PWD}"       # Current directory
 
-#If a build script is provided, create a temporary copy for modification
+# If a build script is provided, create a temporary copy for modification
 if [ -n "$BUILD_SCRIPT_PATH" ]; then
     TEMP_BUILD_SCRIPT_PATH="temp_build_script.sh"
 else
@@ -27,16 +27,13 @@ install_python_version() {
             wget https://www.python.org/ftp/python/3.10.8/Python-3.10.8.tgz
             tar xzf Python-3.10.8.tgz
             cd Python-3.10.8
-            ./configure --prefix=/usr/local --enable-optimizations 
-            make -j ${nproc}
+            ./configure --prefix=/usr/local --enable-optimizations
+            make -j 
             make altinstall
-            cd .. && rm Python-3.10.8.tgz -y
+            cd .. && rm Python-3.10.8.tgz
         fi
         ;;
-    "3.11")
-        yum install -y python${version} python${version}-devel python${version}-pip
-        ;;
-    "3.12")
+    "3.11" | "3.12")
         yum install -y python${version} python${version}-devel python${version}-pip
         ;;
     "3.13")
@@ -46,9 +43,9 @@ install_python_version() {
             tar xzf Python-3.13.0rc1.tgz
             cd Python-3.13.0rc1
             ./configure --prefix=/usr/local --enable-optimizations
-            make -j ${nproc}
+            make -j 
             make altinstall
-            cd .. && rm Python-3.13.0rc1.tgz -y
+            cd .. && rm Python-3.13.0rc1.tgz
         fi
         ;;
     *)
@@ -99,29 +96,57 @@ if [ -n "$BUILD_SCRIPT_PATH" ]; then
 fi
 
 echo "Installing Python..."
+# Install the specified Python version with monitoring
+install_python_version "$PYTHON_VERSION" & # Run the installation in the background
+INSTALL_PID=$!
 
-# Install the specified Python version
-install_python_version "$PYTHON_VERSION"
+# Monitor the installation
+while ps -p $INSTALL_PID >/dev/null; do
+    echo "$INSTALL_PID is running"
+    sleep 30
+done
+
+# Wait for the installation to finish and capture the exit status
+wait $INSTALL_PID
+install_status=$?
+
+# Check if the installation succeeded
+if [ $install_status -ne 0 ]; then
+    echo "Python installation failed. Exiting."
+    exit 1
+fi
 
 # Create and activate virtual environment
 VENV_DIR="$CURRENT_DIR/pyvenv_$PYTHON_VERSION"
 create_venv "$VENV_DIR" "$PYTHON_VERSION"
 
 echo "=============== Running package build-script starts =================="
-if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then # Check if TEMP_BUILD_SCRIPT_PATH is non-empty
 
+if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then
+    # Check if TEMP_BUILD_SCRIPT_PATH is non-empty
     package_name=$(grep -oP '(?<=^PACKAGE_NAME=).*' "$TEMP_BUILD_SCRIPT_PATH" | tr -d '"')
 
-    python"$PYTHON_VERSION" -m pip install --upgrade pip setuptools wheel build pytest nox tox
+    # Run the build script in the background
+    sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS &
+    SCRIPT_PID=$!
 
-    sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS
+    # Monitor the script execution
+    while ps -p $SCRIPT_PID >/dev/null; do
+        echo "$SCRIPT_PID is running"
+        sleep 30
+    done
+
+    # Wait for the script to finish and capture the exit status
+    wait $SCRIPT_PID
+    my_pid_status=$?
 else
     echo "No build script to run, skipping execution."
 fi
+
 echo "=============== Running package build-script ends =================="
 
 # If the build script fails, exit with an error
-if [ $? -ne 0 ]; then
+if [ $my_pid_status -ne 0 ]; then
     echo "Build script execution failed. Exiting."
     cleanup "$VENV_DIR"
     exit 1
@@ -143,8 +168,6 @@ fi
 
 # Clean up the virtual environment
 cleanup "$VENV_DIR"
-
 echo "Build and wheel creation completed successfully."
 [ -n "$TEMP_BUILD_SCRIPT_PATH" ] && rm "$CURRENT_DIR/$TEMP_BUILD_SCRIPT_PATH"
-
 exit 0
