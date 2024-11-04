@@ -4,7 +4,7 @@ set -e
 keep_alive() {
     while true; do
         echo "Still building... please wait."
-        sleep 100  
+        sleep 50  
     done
 }
 
