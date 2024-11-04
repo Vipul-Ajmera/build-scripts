@@ -30,7 +30,7 @@ install_python_version() {
             ./configure --prefix=/usr/local --enable-optimizations 
             make -j ${nproc}
             make altinstall
-            cd .. && rm Python-3.10.8.tgz
+            cd .. && rm Python-3.10.8.tgz -y
         fi
         ;;
     "3.11")
@@ -48,7 +48,7 @@ install_python_version() {
             ./configure --prefix=/usr/local --enable-optimizations
             make -j ${nproc}
             make altinstall
-            cd .. && rm Python-3.13.0rc1.tgz
+            cd .. && rm Python-3.13.0rc1.tgz -y
         fi
         ;;
     *)
