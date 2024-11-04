@@ -150,7 +150,6 @@ jobs:
         - source variable.sh
         - echo "Creating wheels_cache_313 directory"
         - mkdir -p wheels_cache_313
-        - echo "Directory structure before build:"; ls -ltr
         - chmod +x ./script/build_package_python.sh
         - travis_wait 60 bash ./script/build_package_python.sh
         - echo "Wheels created for Python 3.13:"; ls wheels_3.13/
