@@ -28,7 +28,7 @@ install_python_version() {
             tar xzf Python-3.10.8.tgz
             cd Python-3.10.8
             ./configure --prefix=/usr/local --enable-optimizations
-            make -j ${nproc}
+            make -j 2
             make altinstall
             cd .. && rm Python-3.10.8.tgz
         fi
@@ -46,7 +46,7 @@ install_python_version() {
             tar xzf Python-3.13.0rc1.tgz
             cd Python-3.13.0rc1
             ./configure --prefix=/usr/local --enable-optimizations
-            make -j ${nproc}
+            make -j 2
             make altinstall
             cd .. && rm Python-3.13.0rc1.tgz
         fi
@@ -98,28 +98,65 @@ if [ -n "$BUILD_SCRIPT_PATH" ]; then
     format_build_script
 fi
 
-echo "Installing Python..."
-
-# Install the specified Python version
-install_python_version "$PYTHON_VERSION"
+# Install the specified Python version in the background and get its PID
+install_python_version "$PYTHON_VERSION" &
+PYTHON_INSTALL_PID=$!
+ 
+# Monitor the Python installation process
+while ps -p $PYTHON_INSTALL_PID > /dev/null; do
+    echo "Python installation process $PYTHON_INSTALL_PID is running"
+    sleep 100
+done
+ 
+# Wait for the Python installation process to complete and get its exit status
+wait $PYTHON_INSTALL_PID
+python_install_status=$?
+ 
+# Check if the Python installation was successful
+if [ $python_install_status -ne 0 ]; then
+    echo "Python installation failed. Exiting."
+    exit 1
+fi
+ 
+echo "Python installation completed successfully."
 
 # Create and activate virtual environment
 VENV_DIR="$CURRENT_DIR/pyvenv_$PYTHON_VERSION"
 create_venv "$VENV_DIR" "$PYTHON_VERSION"
 
 echo "=============== Running package build-script starts =================="
-if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then # Check if TEMP_BUILD_SCRIPT_PATH is non-empty
-
+ 
+if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then
+    # Check if TEMP_BUILD_SCRIPT_PATH is non-empty
     package_name=$(grep -oP '(?<=^PACKAGE_NAME=).*' "$TEMP_BUILD_SCRIPT_PATH" | tr -d '"')
-
     python"$PYTHON_VERSION" -m pip install --upgrade pip setuptools wheel build pytest nox tox
-
-    sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS
+    
+    # Run the build script in the background and get its PID
+    sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS &
+    SCRIPT_PID=$!
+ 
+    # Monitor the script's PID
+    while ps -p $SCRIPT_PID > /dev/null; do
+        echo "Package build script $SCRIPT_PID is running"
+        sleep 100
+    done
+ 
+    # Wait for the script to complete and get its exit status
+    wait $SCRIPT_PID
+    my_pid_status=$?
+ 
+    # Check if the build script was successful
+    if [ $my_pid_status -ne 0 ]; then
+        echo "Build script execution failed. Exiting."
+        cleanup "$VENV_DIR"
+        exit 1
+    fi
 else
     echo "No build script to run, skipping execution."
 fi
+ 
 echo "=============== Running package build-script ends =================="
-
+ 
 # If the build script fails, exit with an error
 if [ $? -ne 0 ]; then
     echo "Build script execution failed. Exiting."
