@@ -21,13 +21,14 @@ install_python_version() {
     "3.9") yum install -y python${version} python${version}-devel python${version}-pip ;;
     "3.10")
         if ! python3.10 --version &>/dev/null; then
-            wget https://www.python.org/ftp/python/3.10.15/Python-3.10.15.tgz
-            tar xzf Python-3.10.15.tgz
-            cd Python-3.10.15
-            ./configure --prefix=/usr/local --enable-optimizations
-            make -j $(nproc)
+            wget https://www.python.org/ftp/python/3.10.8/Python-3.10.8.tgz 
+            tar xzf Python-3.10.8.tgz 
+            cd Python-3.10.8 
+            ./configure --with-system-ffi --with-computed-gotos --enable-loadable-sqlite-extensions 
+            make -j ${nproc}
             make altinstall
-            cd .. && rm -rf Python-3.10.15.tgz
+            export PATH=$PATH:/usr/local/bin
+            cd .. && rm -rf Python-3.10.8.tgz 
         fi
         ;;
     "3.11") yum install -y python${version} python${version}-devel python${version}-pip ;;
