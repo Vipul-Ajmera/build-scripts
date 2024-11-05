@@ -145,13 +145,13 @@ jobs:
       env: PYTHON_VERSION="3.13"
       script:
         - source variable.sh
-        - mkdir wheels_cache_313
+        #- mkdir wheels_cache_313
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.13:"; ls wheels_3.13/
-        - tar czvf wheels_cache_313/wheels_3.13.tar.gz wheels_3.13
-        - echo "Checking the tar file:"; ls wheels_cache_313/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh
-        #- bash ./script/upload-scripts/upload_file_python.sh wheels_cache_313/wheels_3.13.tar.gz
+        - WHEEL_FILE=*.whl
+        #- echo "Wheels created for Python 3.13:"; ls wheels_3.13/
+        #- tar czvf wheels_cache_313/wheels_3.13.tar.gz wheels_3.13
+        #- echo "Checking the tar file:"; ls wheels_cache_313/
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
       workspaces:
         create:
           name: wheels_cache_313
