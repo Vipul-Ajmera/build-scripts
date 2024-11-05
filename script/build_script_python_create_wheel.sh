@@ -43,7 +43,7 @@ install_python_version() {
             make -j4
             make install
             python3.10 --version
-            cd..
+            cd ..
         fi
         ;;
     "3.11")
@@ -59,7 +59,7 @@ install_python_version() {
             tar xzf Python-3.13.0rc1.tgz
             cd Python-3.13.0rc1
             ./configure --prefix=/usr/local --enable-optimizations
-            make -j ${nproc}
+            make -j2
             make altinstall
             cd .. && rm -rf Python-3.13.0rc1.tgz
         fi
