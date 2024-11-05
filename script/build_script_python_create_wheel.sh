@@ -1,11 +1,24 @@
 set -e
-# Variables
+
+#variables
 PYTHON_VERSION=$1
-BUILD_SCRIPT_PATH=${2:-""} # It's the build script for the package
+BUILD_SCRIPT_PATH=${2:-""} # its the build_script for the package
 EXTRA_ARGS="${@:4}"        # Capture all additional arguments passed to the script
 CURRENT_DIR="${PWD}"       # Current directory
 
-# If a build script is provided, create a temporary copy for modification
+# Start a heartbeat in the background to keep Travis CI from timing out
+keep_alive() {
+    while true; do
+        echo "Still building... please wait."
+        sleep 100  
+    done
+}
+ 
+# Start the heartbeat in the background and save its PID
+keep_alive &
+HEARTBEAT_PID=$!
+
+#If a build script is provided, create a temporary copy for modification
 if [ -n "$BUILD_SCRIPT_PATH" ]; then
     TEMP_BUILD_SCRIPT_PATH="temp_build_script.sh"
 else
@@ -18,21 +31,26 @@ yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-deve
 install_python_version() {
     local version=$1
     case $version in
-    "3.9") yum install -y python${version} python${version}-devel python${version}-pip ;;
+    "3.9")
+        yum install -y python${version} python${version}-devel python${version}-pip
+        ;;
     "3.10")
         if ! python3.10 --version &>/dev/null; then
-            wget https://www.python.org/ftp/python/3.10.8/Python-3.10.8.tgz 
-            tar xzf Python-3.10.8.tgz 
-            cd Python-3.10.8 
-            ./configure --with-system-ffi --with-computed-gotos --enable-loadable-sqlite-extensions 
+            wget https://www.python.org/ftp/python/3.10.15/Python-3.10.15.tgz
+            tar xzf Python-3.10.15.tgz
+            cd Python-3.10.15
+            ./configure --prefix=/usr/local --enable-optimizations 
             make -j ${nproc}
             make altinstall
-            export PATH=$PATH:/usr/local/bin
-            cd .. && rm -rf Python-3.10.8.tgz 
+            cd .. && rm -rf Python-3.10.15.tgz
         fi
         ;;
-    "3.11") yum install -y python${version} python${version}-devel python${version}-pip ;;
-    "3.12") yum install -y python${version} python${version}-devel python${version}-pip ;;
+    "3.11")
+        yum install -y python${version} python${version}-devel python${version}-pip
+        ;;
+    "3.12")
+        yum install -y python${version} python${version}-devel python${version}-pip
+        ;;
     "3.13")
         if ! python3.13 --version &>/dev/null; then
             echo "Now installing python3.13..."
@@ -40,7 +58,7 @@ install_python_version() {
             tar xzf Python-3.13.0rc1.tgz
             cd Python-3.13.0rc1
             ./configure --prefix=/usr/local --enable-optimizations
-            make -j $(nproc)
+            make -j ${nproc}
             make altinstall
             cd .. && rm -rf Python-3.13.0rc1.tgz
         fi
@@ -87,68 +105,61 @@ cleanup() {
     rm -rf "$VENV_DIR"
 }
 
-# Start the main script in the background and monitor its PID
-(
-    # Format the build script if it's non-empty
-    if [ -n "$BUILD_SCRIPT_PATH" ]; then
-        format_build_script
-    fi
+# Format the build script if it's non-empty
+if [ -n "$BUILD_SCRIPT_PATH" ]; then
+    format_build_script
+fi
 
-    echo "Installing Python..."
-    # Install the specified Python version
-    install_python_version "$PYTHON_VERSION"
+echo "Installing Python..."
 
-    # Create and activate virtual environment
-    VENV_DIR="$CURRENT_DIR/pyvenv_$PYTHON_VERSION"
-    create_venv "$VENV_DIR" "$PYTHON_VERSION"
+# Install the specified Python version
+install_python_version "$PYTHON_VERSION"
 
-    echo "=============== Running package build-script starts =================="
-    if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then
-        # Check if TEMP_BUILD_SCRIPT_PATH is non-empty
-        package_name=$(grep -oP '(?<=^PACKAGE_NAME=).*' "$TEMP_BUILD_SCRIPT_PATH" | tr -d '"')
-        python"$PYTHON_VERSION" -m pip install --upgrade pip setuptools wheel build pytest nox tox
-        sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS
-    else
-        echo "No build script to run, skipping execution."
-    fi
+# Create and activate virtual environment
+VENV_DIR="$CURRENT_DIR/pyvenv_$PYTHON_VERSION"
+create_venv "$VENV_DIR" "$PYTHON_VERSION"
 
-    echo "=============== Running package build-script ends =================="
+echo "=============== Running package build-script starts =================="
+if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then # Check if TEMP_BUILD_SCRIPT_PATH is non-empty
 
-    # Navigate to the specified directory
-    echo "Navigating to the specified directory"
-    cd $package_name
+    package_name=$(grep -oP '(?<=^PACKAGE_NAME=).*' "$TEMP_BUILD_SCRIPT_PATH" | tr -d '"')
 
-    # Build the wheel
-    echo ""
-    echo "*****************************************************************************"
-    echo "Building the wheel..."
-    if ! python -m build --wheel --outdir="$CURRENT_DIR/wheels_$PYTHON_VERSION/"; then
-        echo "Wheel creation failed for Python $PYTHON_VERSION."
-        cleanup "$VENV_DIR"
-        [ -n "$TEMP_BUILD_SCRIPT_PATH" ] && rm "$CURRENT_DIR/$TEMP_BUILD_SCRIPT_PATH"
-        exit 1
-    fi
+    python"$PYTHON_VERSION" -m pip install --upgrade pip setuptools wheel build pytest nox tox
 
-    # Clean up the virtual environment
+    sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS
+else
+    echo "No build script to run, skipping execution."
+fi
+echo "=============== Running package build-script ends =================="
+
+# If the build script fails, exit with an error
+if [ $? -ne 0 ]; then
+    echo "Build script execution failed. Exiting."
     cleanup "$VENV_DIR"
+    exit 1
+fi
 
-    # Stop the heartbeat process now that the build has completed
-    echo "Build and wheel creation completed successfully."
+echo "Navigating to the specified directory"
+cd $package_name
 
+# Build the wheel
+echo ""
+echo "*****************************************************************************"
+echo "Building the wheel..."
+if ! python -m build --wheel --outdir="$CURRENT_DIR/wheels_$PYTHON_VERSION/"; then
+    echo "Wheel creation failed for Python $PYTHON_VERSION."
+    cleanup "$VENV_DIR"
     [ -n "$TEMP_BUILD_SCRIPT_PATH" ] && rm "$CURRENT_DIR/$TEMP_BUILD_SCRIPT_PATH"
-    exit 0
-) &
-SCRIPT_PID=$!
+    exit 1
+fi
 
-# Print the PID every 100 seconds to keep Travis CI alive
-while ps -p $SCRIPT_PID >/dev/null; do
-    echo "$SCRIPT_PID is running"
-    sleep 100
-done
+# Clean up the virtual environment
+cleanup "$VENV_DIR"
 
-# Wait for the script to finish and capture its exit status
-wait $SCRIPT_PID
-my_pid_status=$?
+# Stop the heartbeat process now that the build has completed
+kill $HEARTBEAT_PID
 
-# Exit with the captured status
-exit $my_pid_status
+echo "Build and wheel creation completed successfully."
+[ -n "$TEMP_BUILD_SCRIPT_PATH" ] && rm "$CURRENT_DIR/$TEMP_BUILD_SCRIPT_PATH"
+
+exit 0
