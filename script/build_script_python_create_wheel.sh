@@ -36,14 +36,14 @@ install_python_version() {
         ;;
     "3.10")
         if ! python3.10 --version &>/dev/null; then
-            wget https://www.python.org/ftp/python/3.10.8/Python-3.10.8.tgz
-            tar xzf Python-3.10.8.tgz
-            cd Python-3.10.8
-            ./configure --with-system-ffi --with-computed-gotos --enable-loadable-sqlite-extensions
-            make -j ${nproc}
-            make altinstall
-            export PATH=$PATH:/usr/local/bin
-            cd .. && rm -rf Python-3.10.8.tgz
+            wget https://www.python.org/ftp/python/3.10.0/Python-3.10.0.tgz
+            tar xf Python-3.10.0.tgz
+            cd Python-3.10.0
+            ./configure --prefix=/usr/local --enable-optimizations
+            make -j4
+            make install
+            python3.10 --version
+            cd..
         fi
         ;;
     "3.11")
