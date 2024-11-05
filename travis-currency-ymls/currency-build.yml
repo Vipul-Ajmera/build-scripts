@@ -1,4 +1,3 @@
-
 os: linux
 dist: focal
 arch: ppc64le
@@ -72,16 +71,13 @@ jobs:
       script:
         - source variable.sh
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - ls
-        - WHEEL_FILE=$(find . -name "*.whl")
-        - echo "Uploading while file: $WHEEL_FILE"
-        #- echo "Wheels created for Python 3.9:"; ls wheels_3.9/
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh "$WHEEL_FILE" 
+        - WHEEL_FILE=*.whl
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
       workspaces:
         create:
           name: wheels_cache_39
           paths:
-            - wheels_3.9/
+            - ./*.whl
         use: build_cache
       allow_failure: true
 
@@ -90,35 +86,30 @@ jobs:
       env: PYTHON_VERSION="3.10"
       script:
         - source variable.sh
-        - mkdir wheels_cache_310 
-        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.10:"; ls wheels_3.10/
-        - tar -czvf wheels_cache_310/wheels_3.10.tar.gz wheels_3.10/
-        - echo "Checking the tar file:"; ls -l wheels_cache_310/wheels_3.10.tar.gz
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_310/wheels_3.10.tar.gz
+        - chmod +x ./script/build_package_python.sh
+        - travis wait 60 bash ./script/build_package_python.sh;
+        - WHEEL_FILE=*.whl
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
       workspaces:
         create:
           name: wheels_cache_310
           paths:
-            - wheels_3.10/
+            - ./*.whl
         use: build_cache
       allow_failure: true
-      
+
     - name: "Create Wheel for Python 3.11"
       if: env(WHEEL_CREATION) = true
       env: PYTHON_VERSION="3.11"
       script:
         - source variable.sh
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
-        - echo "Wheels created for Python 3.11:"; ls wheels_3.11/
-        #- tar czvf wheels_cache_311/wheels_3.11.tar.gz wheels_3.11
-        #- echo "Checking the tar file:"; ls wheels_cache_311/
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.11/*.whl
+        - WHEEL_FILE=*.whl
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
       workspaces:
         create:
           name: wheels_cache_311
-          paths:
-            - wheels_3.11/
+          paths: ./*.whl
         use: build_cache
       allow_failure: true
 
@@ -127,19 +118,14 @@ jobs:
       env: PYTHON_VERSION="3.12"
       script:
         - source variable.sh
-        - mkdir wheels_cache_312
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - WHEEL_FILE=*.whl
-        - echo "Uploading while file: $WHEEL_FILE"
-        - echo "Wheels created for Python 3.12:"; ls wheels_3.12/
-        #- tar czvf wheels_cache_312/wheels_3.12.tar.gz wheels_3.12
-        #- echo "Checking the tar file:"; ls wheels_cache_312/
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE 
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
       workspaces:
         create:
           name: wheels_cache_312
           paths:
-            - wheels_3.12/
+            - ./*.whl
         use: build_cache
       allow_failure: true
 
@@ -148,21 +134,18 @@ jobs:
       env: PYTHON_VERSION="3.13"
       script:
         - source variable.sh
-        #- mkdir wheels_cache_313
-        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - chmod +x ./script/build_package_python.sh
+        - travis_wait 60 bash ./script/build_package_python.sh
         - WHEEL_FILE=*.whl
-        #- echo "Wheels created for Python 3.13:"; ls wheels_3.13/
-        #- tar czvf wheels_cache_313/wheels_3.13.tar.gz wheels_3.13
-        #- echo "Checking the tar file:"; ls wheels_cache_313/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
       workspaces:
         create:
           name: wheels_cache_313
           paths:
-            - wheels_3.13/
+            - ./*.whl
         use: build_cache
       allow_failure: true
-      
+
     - stage: Source code scanner
       if: env(ENABLE_TRIVY) = true AND env(VALIDATE_BUILD_SCRIPT) = true
       name: Run trivy scan
