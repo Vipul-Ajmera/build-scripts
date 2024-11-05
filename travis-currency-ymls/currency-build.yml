@@ -74,8 +74,9 @@ jobs:
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - ls
         - WHEEL_FILE=$(find . -name "*.whl")
+        - echo "Uploading while file: $WHEEL_FILE"
         #- echo "Wheels created for Python 3.9:"; ls wheels_3.9/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh "$WHEEL_FILE" 
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh "$WHEEL_FILE" 
       workspaces:
         create:
           name: wheels_cache_39
@@ -112,7 +113,7 @@ jobs:
         - echo "Wheels created for Python 3.11:"; ls wheels_3.11/
         #- tar czvf wheels_cache_311/wheels_3.11.tar.gz wheels_3.11
         #- echo "Checking the tar file:"; ls wheels_cache_311/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.11/*.whl
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.11/*.whl
       workspaces:
         create:
           name: wheels_cache_311
@@ -129,10 +130,11 @@ jobs:
         - mkdir wheels_cache_312
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - WHEEL_FILE=*.whl
-        #- echo "Wheels created for Python 3.12:"; ls wheels_3.12/
+        - echo "Uploading while file: $WHEEL_FILE"
+        - echo "Wheels created for Python 3.12:"; ls wheels_3.12/
         #- tar czvf wheels_cache_312/wheels_3.12.tar.gz wheels_3.12
         #- echo "Checking the tar file:"; ls wheels_cache_312/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE 
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE 
       workspaces:
         create:
           name: wheels_cache_312
