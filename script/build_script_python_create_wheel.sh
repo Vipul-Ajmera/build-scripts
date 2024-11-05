@@ -10,10 +10,10 @@ CURRENT_DIR="${PWD}"       # Current directory
 keep_alive() {
     while true; do
         echo "Still building... please wait."
-        sleep 100  
+        sleep 100
     done
 }
- 
+
 # Start the heartbeat in the background and save its PID
 keep_alive &
 HEARTBEAT_PID=$!
@@ -36,13 +36,14 @@ install_python_version() {
         ;;
     "3.10")
         if ! python3.10 --version &>/dev/null; then
-            wget https://www.python.org/ftp/python/3.10.15/Python-3.10.15.tgz
-            tar xzf Python-3.10.15.tgz
-            cd Python-3.10.15
-            ./configure --prefix=/usr/local --enable-optimizations 
+            wget https://www.python.org/ftp/python/3.10.8/Python-3.10.8.tgz
+            tar xzf Python-3.10.8.tgz
+            cd Python-3.10.8
+            ./configure --with-system-ffi --with-computed-gotos --enable-loadable-sqlite-extensions
             make -j ${nproc}
             make altinstall
-            cd .. && rm -rf Python-3.10.15.tgz
+            export PATH=$PATH:/usr/local/bin
+            cd .. && rm -rf Python-3.10.8.tgz
         fi
         ;;
     "3.11")
