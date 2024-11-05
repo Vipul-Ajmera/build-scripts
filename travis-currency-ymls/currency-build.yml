@@ -73,8 +73,9 @@ jobs:
         - source variable.sh
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - ls
-        - echo "Wheels created for Python 3.9:"; ls wheels_3.9/
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.9
+        - WHEEL_FILE=$(find . -name "*.whl")
+        #- echo "Wheels created for Python 3.9:"; ls wheels_3.9/
+        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh "$WHEEL_FILE" 
       workspaces:
         create:
           name: wheels_cache_39
