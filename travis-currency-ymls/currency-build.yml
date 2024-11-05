@@ -87,7 +87,7 @@ jobs:
       script:
         - source variable.sh
         - chmod +x ./script/build_package_python.sh
-        - travis wait 60 bash ./script/build_package_python.sh;
+        - travis_wait 60 bash ./script/build_package_python.sh;
         - WHEEL_FILE=*.whl
         #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
       workspaces:
