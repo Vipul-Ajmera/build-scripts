@@ -1,22 +1,22 @@
 set -e
 
+#variables
+PYTHON_VERSION=$1
+BUILD_SCRIPT_PATH=${2:-""} # its the build_script for the package
+EXTRA_ARGS="${@:4}"        # Capture all additional arguments passed to the script
+CURRENT_DIR="${PWD}"       # Current directory
+
 # Start a heartbeat in the background to keep Travis CI from timing out
 keep_alive() {
     while true; do
         echo "Still building... please wait."
-        sleep 50  
+        sleep 100
     done
 }
 
 # Start the heartbeat in the background and save its PID
 keep_alive &
 HEARTBEAT_PID=$!
-
-#variables
-PYTHON_VERSION=$1
-BUILD_SCRIPT_PATH=${2:-""} # its the build_script for the package
-EXTRA_ARGS="${@:4}"        # Capture all additional arguments passed to the script
-CURRENT_DIR="${PWD}"       # Current directory
 
 #If a build script is provided, create a temporary copy for modification
 if [ -n "$BUILD_SCRIPT_PATH" ]; then
@@ -25,6 +25,7 @@ else
     TEMP_BUILD_SCRIPT_PATH=""
 fi
 
+echo "Installing dependencies"
 yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
 
 # Function to install a specific Python version
@@ -36,13 +37,17 @@ install_python_version() {
         ;;
     "3.10")
         if ! python3.10 --version &>/dev/null; then
+            echo "Installing python3.10"
             wget https://www.python.org/ftp/python/3.10.8/Python-3.10.8.tgz
             tar xzf Python-3.10.8.tgz
             cd Python-3.10.8
             ./configure --prefix=/usr/local --enable-optimizations 
+            echo "Configure completed"
             make -j ${nproc}
+            echo "make completed"
             make altinstall
             cd .. && rm -rf Python-3.10.8.tgz
+            echo "Installation completed"
         fi
         ;;
     "3.11")
@@ -61,6 +66,7 @@ install_python_version() {
             make -j 2
             make altinstall
             cd .. && rm -rf Python-3.13.0rc1.tgz
+            echo "Installation completed"
         fi
         ;;
     *)
@@ -127,6 +133,10 @@ if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then # Check if TEMP_BUILD_SCRIPT_PATH is n
     python"$PYTHON_VERSION" -m pip install --upgrade pip setuptools wheel build pytest nox tox
 
     sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS
+
+    # Stop the heartbeat process now that the build has completed
+    kill $HEARTBEAT_PID
+    
 else
     echo "No build script to run, skipping execution."
 fi
@@ -155,9 +165,6 @@ fi
 
 # Clean up the virtual environment
 cleanup "$VENV_DIR"
-
-# Stop the heartbeat process now that the build has completed
-kill $HEARTBEAT_PID
 
 echo "Build and wheel creation completed successfully."
 [ -n "$TEMP_BUILD_SCRIPT_PATH" ] && rm "$CURRENT_DIR/$TEMP_BUILD_SCRIPT_PATH"
