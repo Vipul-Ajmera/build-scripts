@@ -71,12 +71,11 @@ jobs:
       env: PYTHON_VERSION="3.9"
       script:
         - source variable.sh
-        - mkdir wheels_cache_39 
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - echo "Wheels created for Python 3.9:"; ls wheels_3.9/
-        - tar czvf wheels_cache_39/wheels_3.9.tar.gz wheels_3.9
-        - echo "Checking the tar file:"; ls wheels_cache_39/
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_cache_39/wheels_3.9.tar.gz
+        # - tar czvf wheels_cache_39/wheels_3.9.tar.gz wheels_3.9
+        #- echo "Checking the tar file:"; ls wheels_cache_39/
+        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh wheels_3.9
       workspaces:
         create:
           name: wheels_cache_39
