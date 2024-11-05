@@ -147,7 +147,7 @@ cd $package_name
 echo ""
 echo "*****************************************************************************"
 echo "Building the wheel..."
-if ! python -m build --wheel --outdir="$CURRENT_DIR/wheels_$PYTHON_VERSION/"; then
+if ! python -m build --wheel --outdir="$CURRENT_DIR/"; then
     echo "Wheel creation failed for Python $PYTHON_VERSION."
     cleanup "$VENV_DIR"
     [ -n "$TEMP_BUILD_SCRIPT_PATH" ] && rm "$CURRENT_DIR/$TEMP_BUILD_SCRIPT_PATH"
