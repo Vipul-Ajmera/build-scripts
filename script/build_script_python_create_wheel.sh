@@ -6,26 +6,12 @@ BUILD_SCRIPT_PATH=${2:-""} # its the build_script for the package
 EXTRA_ARGS="${@:4}"        # Capture all additional arguments passed to the script
 CURRENT_DIR="${PWD}"       # Current directory
 
-# Start a heartbeat in the background to keep Travis CI from timing out
-keep_alive() {
-    while true; do
-        echo "Still building... please wait."
-        sleep 100
-    done
-}
-
-# Start the heartbeat in the background and save its PID
-keep_alive &
-HEARTBEAT_PID=$!
-
 #If a build script is provided, create a temporary copy for modification
 if [ -n "$BUILD_SCRIPT_PATH" ]; then
     TEMP_BUILD_SCRIPT_PATH="temp_build_script.sh"
 else
     TEMP_BUILD_SCRIPT_PATH=""
 fi
-
-yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
 
 # Function to install a specific Python version
 install_python_version() {
@@ -36,11 +22,19 @@ install_python_version() {
         ;;
     "3.10")
         if ! python3.10 --version &>/dev/null; then
-            wget https://www.python.org/ftp/python/3.10.0/Python-3.10.0.tgz
-            tar xf Python-3.10.0.tgz
-            cd Python-3.10.0
+            echo "Installing required dependencies for installing python..."
+            yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
+            echo "Now installing python3.13..."
+            wget https://www.python.org/ftp/python/3.10.15/Python-3.10.15.tgz
+            tar xf Python-3.10.15.tgz
+            cd Python-3.10.15
+            echo "Building python3.13..."
             ./configure --prefix=/usr/local --enable-optimizations
+            echo "Still building..."
+            make -j2
+            echo "Still building..."
             make altinstall
+            echo "Python installation successful..."
             python3.10 --version
             cd ..
         fi
@@ -53,6 +47,8 @@ install_python_version() {
         ;;
     "3.13")
         if ! python3.13 --version &>/dev/null; then
+            echo "Installing required dependencies for installing python"
+            yum install -y gcc gcc-c++ make openssl-devel bzip2-devel libffi-devel zlib-devel wget
             echo "Now installing python3.13..."
             wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0rc1.tgz
             tar xzf Python-3.13.0rc1.tgz
@@ -155,9 +151,6 @@ fi
 
 # Clean up the virtual environment
 cleanup "$VENV_DIR"
-
-# Stop the heartbeat process now that the build has completed
-kill $HEARTBEAT_PID
 
 echo "Build and wheel creation completed successfully."
 [ -n "$TEMP_BUILD_SCRIPT_PATH" ] && rm "$CURRENT_DIR/$TEMP_BUILD_SCRIPT_PATH"
