@@ -6,7 +6,6 @@ language: shell
 branches:
   only:
     - master
-    - python_ecosystem
 
 env:
   global:
