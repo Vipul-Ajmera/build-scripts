@@ -32,10 +32,10 @@ install_python_version() {
     "3.10")
         if ! python3.10 --version &>/dev/null; then
             echo "Now installing python3.10..."
-            wget https://www.python.org/ftp/python/3.10.14/Python-3.10.14.tgz
-            tar xf Python-3.10.14.tgz
+            wget https://www.python.org/ftp/python/3.10.15/Python-3.10.15.tgz
+            tar xf Python-3.10.15.tgz
             echo "Building python3.10..."
-            cd Python-3.10.14
+            cd Python-3.10.15
             echo "Still building..."
             ./configure --prefix=/usr/local --enable-optimizations
             echo "Still building..."
