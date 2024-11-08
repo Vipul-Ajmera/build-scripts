@@ -70,9 +70,9 @@ jobs:
       env: PYTHON_VERSION="3.9"
       script:
         - source variable.sh
-        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - chmod +x ./script/build_package.sh; bash ./script/build_package.sh;
         - WHEEL_FILE=*.whl
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
+        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh $WHEEL_FILE
       workspaces:
         create:
           name: wheels_cache_39
@@ -86,9 +86,9 @@ jobs:
       env: PYTHON_VERSION="3.10"
       script:
         - source variable.sh
-        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - chmod +x ./script/build_package.sh; bash ./script/build_package.sh;
         - WHEEL_FILE=*.whl
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
+        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh $WHEEL_FILE
       workspaces:
         create:
           name: wheels_cache_310
@@ -102,9 +102,9 @@ jobs:
       env: PYTHON_VERSION="3.11"
       script:
         - source variable.sh
-        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - chmod +x ./script/build_package.sh; bash ./script/build_package.sh;
         - WHEEL_FILE=*.whl
-        - chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
+        - chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh $WHEEL_FILE
       workspaces:
         create:
           name: wheels_cache_311
@@ -117,9 +117,9 @@ jobs:
       env: PYTHON_VERSION="3.12"
       script:
         - source variable.sh
-        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - chmod +x ./script/build_package.sh; bash ./script/build_package.sh;
         - WHEEL_FILE=*.whl
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
+        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh $WHEEL_FILE
       workspaces:
         create:
           name: wheels_cache_312
@@ -133,9 +133,9 @@ jobs:
       env: PYTHON_VERSION="3.13"
       script:
         - source variable.sh
-        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
+        - chmod +x ./script/build_package.sh; bash ./script/build_package.sh;
         - WHEEL_FILE=*.whl
-        #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
+        #- chmod +x ./script/upload-scripts/upload_file.sh; bash ./script/upload-scripts/upload_file.sh $WHEEL_FILE
       workspaces:
         create:
           name: wheels_cache_313
