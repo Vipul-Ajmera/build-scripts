@@ -10,65 +10,72 @@ echo "**************************************************************************
 
 docker_image=""
 
-# Function to build a custom Docker image for non-root users.
+# the below function is used for building a custom docker image, it will be called only when non root user build is set to true.
+# function accepts one argument, which is the base image value.
 docker_build_non_root() {
-    echo "building docker image for non-root user build"
+    echo "building docker image for non root user build"
     docker build --build-arg BASE_IMAGE="$1" -t docker_non_root_image -f script/dockerfile_non_root .
     docker_image="docker_non_root_image"
 }
 
-# Select base image based on `TESTED_ON` and `NON_ROOT_BUILD` flags.
+#Below conditions are used to select the base image based on the 2 flags, tested_on and non_root_build. A docker_build_non_root function is called when non root build is true.
 if [[ "$TESTED_ON" == UBI:9* || "$TESTED_ON" == UBI9* ]]; then
     docker pull registry.access.redhat.com/ubi9/ubi:9.3
     docker_image="registry.access.redhat.com/ubi9/ubi:9.3"
-    [[ "$NON_ROOT_BUILD" == "true" ]] && docker_build_non_root "registry.access.redhat.com/ubi9/ubi:9.3"
+    if [[ "$NON_ROOT_BUILD" == "true" ]]; then
+        docker_build_non_root "registry.access.redhat.com/ubi9/ubi:9.3"
+    fi
 else
     docker pull registry.access.redhat.com/ubi8/ubi:8.7
     docker_image="registry.access.redhat.com/ubi8/ubi:8.7"
-    [[ "$NON_ROOT_BUILD" == "true" ]] && docker_build_non_root "registry.access.redhat.com/ubi8/ubi:8.7"
+    if [[ "$NON_ROOT_BUILD" == "true" ]]; then
+        docker_build_non_root "registry.access.redhat.com/ubi8/ubi:8.7"
+    fi
 fi
 
 # Function to run validation scripts and handle logging.
 run_and_log() {
-    local -a script_args=($1) # Split the script arguments into an array
-    local log_file="$2"
+    local script_args=("$@") # Split the script arguments into an array
 
-    python3 script/validate_builds_currency.py "${script_args[@]}" >"$log_file" &
-    local pid=$!
+    python3 script/validate_builds_currency.py "${script_args[@]}" > build_log &
 
     # Monitor the process
-    while ps -p $pid >/dev/null; do
-        echo "$pid is running"
+    SCRIPT_PID=$!
+    while ps -p $SCRIPT_PID >/dev/null; do
+        echo "$SCRIPT_PID is running"
         sleep 100
     done
-    wait $pid
-    local status=$?
-    local log_size=$(stat -c %s "$log_file")
+    wait $SCRIPT_PID
+    my_pid_status=$?
+    build_size=$(stat -c %s build_log)
 
-    if [ $status -ne 0 ]; then
+    if [ $my_pid_status != 0 ]; then
         echo "Script execution failed for "$PKG_DIR_PATH$BUILD_SCRIPT" "$VERSION" "
         echo "*************************************************************************************"
-        if [ $log_size -lt 1800000 ]; then
-            cat "$log_file"
+        if [ $build_size -lt 1800000 ]; then
+            cat build_log
         else
-            tail -100 "$log_file"
+            tail -100 build_log
         fi
         exit 1
     else
         echo "Script execution completed successfully for "$PKG_DIR_PATH$BUILD_SCRIPT" "$VERSION" "
         echo "*************************************************************************************"
-        if [ $log_size -lt 1800000 ]; then
-            cat "$log_file"
+        if [ $build_size -lt 1800000 ]; then
+            cat build_log
         else
-            tail -100 "$log_file"
+            tail -100 build_log
         fi
     fi
 }
 
-# Run the required validation scripts
-[[ "$VALIDATE_BUILD_SCRIPT" == "true" ]] && run_and_log "$PKG_DIR_PATH$BUILD_SCRIPT $VERSION $docker_image" "validate_build_log"
+# Run the required validation scripts based on flags
+if [[ "$VALIDATE_BUILD" == "true" ]]; then
+    run_and_log "$PKG_DIR_PATH$BUILD_SCRIPT" "$VERSION" "$docker_image"
+fi
 
-WHEEL_SCRIPT=script/build_script_python_create_wheel.sh
-[[ "$WHEEL_BUILD" == "true" ]] && run_and_log "$WHEEL_SCRIPT $PYTHON_VERSION $PKG_DIR_PATH$BUILD_SCRIPT $VERSION $docker_image" "wheel_build_log"
+if [[ "$WHEEL_BUILD" == "true" ]]; then
+    run_and_log "$WHEEL_script" "$PYTHON_VERSION" "$docker_image" "$PKG_DIR_PATH$BUILD_SCRIPT" "$VERSION"
+fi
 
 exit 0
