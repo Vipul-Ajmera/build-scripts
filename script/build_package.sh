@@ -1,81 +1,110 @@
-#!/bin/bash -e
+import os
+import stat
+import requests
+import sys
+import subprocess
+import docker
+import json
 
-sudo apt update -y && sudo apt-get install file -y
-#pip3 install --upgrade requests
-pip3 install --force-reinstall -v "requests==2.31.0"
-pip3 install --upgrade docker
 
-echo "Running build script execution in background for "$PKG_DIR_PATH$BUILD_SCRIPT" "$VERSION" "
-echo "*************************************************************************************"
+# for validate_build_script
+def trigger_script_validation_checks(file_name, version, image_name):
+    # Spawn a container and pass the build script
+    client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+    st = os.stat(file_name)
+    current_dir = os.getcwd()
+    os.chmod("{}/{}".format(current_dir, file_name), st.st_mode | stat.S_IEXEC)
+    # Let the container run in non detach mode, as we need to delete the container on operation completion
+    print(current_dir)
+    print(file_name)
+    package = file_name.split("/")[1]
+    print(package)
+    try:
+        command = [
+            "bash",
+            "-c",
+            f"cd /home/tester/ && ./{file_name} {version} "
+        ]
+        
+        container = client.containers.run(
+            image_name,
+            command,
+            network = 'host',
+            detach = True,
+            volumes = {
+                current_dir : {'bind': '/home/tester/', 'mode': 'rw'}
+            },
+            stderr = True, # Return logs from STDERR
+        )
+        result = container.wait()
+    except Exception as e:
+        print(f"Failed to created container: {e}")    
+    try:
+        print(container.logs().decode("utf-8"))
+    except Exception:
+        print(container.logs())
+    container.remove()
+    if int(result["StatusCode"]) != 0:
+        raise Exception(f"Build script validation failed for {file_name} !")
+    else:
+        return True
+    
+    
+# for wheel_build  
+def trigger_script_validation_checks_wheel(wheel_file_name, python_version, image_name, file_name, version):
+    # Spawn a container and pass the build script
+    client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 
-docker_image=""
+    st = os.stat(wheel_file_name)
+    current_dir = os.getcwd()
+    os.chmod("{}/{}".format(current_dir, wheel_file_name), st.st_mode | stat.S_IEXEC)
+ 
+    st = os.stat(file_name)
+    current_dir = os.getcwd()
+    os.chmod("{}/{}".format(current_dir, file_name), st.st_mode | stat.S_IEXEC)
 
-# the below function is used for building a custom docker image, it will be called only when non root user build is set to true.
-# function accepts one argument, which is the base image value.
-docker_build_non_root() {
-    echo "building docker image for non root user build"
-    docker build --build-arg BASE_IMAGE="$1" -t docker_non_root_image -f script/dockerfile_non_root .
-    docker_image="docker_non_root_image"
-}
+    # Let the container run in non detach mode, as we need to delete the container on operation completion
+    print(current_dir)
+    print(wheel_file_name)
+    print (file_name)
+    package = file_name.split("/")[1]
+    print(package)
 
-#Below conditions are used to select the base image based on the 2 flags, tested_on and non_root_build. A docker_build_non_root function is called when non root build is true.
-if [[ "$TESTED_ON" == UBI:9* || "$TESTED_ON" == UBI9* ]]; then
-    docker pull registry.access.redhat.com/ubi9/ubi:9.3
-    docker_image="registry.access.redhat.com/ubi9/ubi:9.3"
-    if [[ "$NON_ROOT_BUILD" == "true" ]]; then
-        docker_build_non_root "registry.access.redhat.com/ubi9/ubi:9.3"
-    fi
-else
-    docker pull registry.access.redhat.com/ubi8/ubi:8.7
-    docker_image="registry.access.redhat.com/ubi8/ubi:8.7"
-    if [[ "$NON_ROOT_BUILD" == "true" ]]; then
-        docker_build_non_root "registry.access.redhat.com/ubi8/ubi:8.7"
-    fi
-fi
+    try:
+        command = [
+            "bash",
+            "-c",
+            f"cd /home/tester/ && ./{wheel_file_name} {python_version} {file_name} {version} "
+        ]
+        
+        container = client.containers.run(
+            image_name,
+            command,
+            network = 'host',
+            detach = True,
+            volumes = {
+                current_dir : {'bind': '/home/tester/', 'mode': 'rw'}
+            },
+            stderr = True, # Return logs from STDERR
+        )
+        result = container.wait()
+    except Exception as e:
+        print(f"Failed to created container: {e}")    
+    try:
+        print(container.logs().decode("utf-8"))
+    except Exception:
+        print(container.logs())
+    container.remove()
+    if int(result["StatusCode"]) != 0:
+        raise Exception(f"Build script validation failed for {file_name} !")
+    else:
+        return True
 
-# Function to run validation scripts and handle logging.
-run_and_log() {
-    local script_args=("$@") # Split the script arguments into an array
 
-    python3 script/validate_builds_currency.py "${script_args[@]}" > build_log &
-
-    # Monitor the process
-    SCRIPT_PID=$!
-    while ps -p $SCRIPT_PID >/dev/null; do
-        echo "$SCRIPT_PID is running"
-        sleep 100
-    done
-    wait $SCRIPT_PID
-    my_pid_status=$?
-    build_size=$(stat -c %s build_log)
-
-    if [ $my_pid_status != 0 ]; then
-        echo "Script execution failed for "$PKG_DIR_PATH$BUILD_SCRIPT" "$VERSION" "
-        echo "*************************************************************************************"
-        if [ $build_size -lt 1800000 ]; then
-            cat build_log
-        else
-            tail -100 build_log
-        fi
-        exit 1
-    else
-        echo "Script execution completed successfully for "$PKG_DIR_PATH$BUILD_SCRIPT" "$VERSION" "
-        echo "*************************************************************************************"
-        if [ $build_size -lt 1800000 ]; then
-            cat build_log
-        else
-            tail -100 build_log
-        fi
-    fi
-}
-
-# Run the required validation scripts based on flags
-if [[ "$VALIDATE_BUILD" == "true" ]]; then
-    run_and_log "$PKG_DIR_PATH$BUILD_SCRIPT" "$VERSION" "$docker_image"
-fi
-
-if [[ "$WHEEL_BUILD" == "true" ]]; then
-    run_and_log "$WHEEL_script" "$PYTHON_VERSION" "$docker_image" "$PKG_DIR_PATH$BUILD_SCRIPT" "$VERSION"
-fi
-
-exit 0
+if __name__=="__main__":
+    if len(sys.argv) == 4:
+        print("Inside python program")
+        trigger_script_validation_checks(sys.argv[1],sys.argv[2],sys.argv[3])
+    if len(sys.argv) == 6:
+        print("Inside python program")
+        trigger_script_validation_checks_wheel(sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],sys.argv[5])
