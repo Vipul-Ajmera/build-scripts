@@ -1,11 +1,11 @@
 #!/bin/bash -e
 
 # Check if the build is validate_build_script or wheel_build
-if [[ "$validate_build_script" == "true" ]]; then
+if [[ "$VALIDATE_BUILD_SCRIPT" == "true" ]]; then
     api_key="$travis_currency_service_id_api_key" # API key for validate_build_script
     content_type="application/gzip"
     s3_url="https://s3.au-syd.cloud-object-storage.appdomain.cloud/currency-automation-toolci-bucket" # URL for validate_build_script
-elif [[ "$wheel_build" == "true" ]]; then
+elif [[ "$WHEEL_BUILD" == "true" ]]; then
     api_key="$currency_ecosystem_dev_service_api_key" # API key for wheel build
     content_type="application/octet-stream"
     s3_url="https://s3.us-east.cloud-object-storage.appdomain.cloud/currency-artifacts" # URL for wheel_build
