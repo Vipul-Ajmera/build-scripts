@@ -15,76 +15,6 @@ EXTRA_ARGS="${@:3}" # Capture all additional arguments passed to the script
 
 CURRENT_DIR="${PWD}"
 
-# install required dependencies
-echo "Installing dependencies required for python installation..."
-(
-    while true; do
-        sleep 60
-        echo "Still installing dependencies..."
-    done &
-    yum install -y sudo zlib-devel wget ncurses git gcc gcc-c++ make cmake
-    yum install -y libffi libffi-devel sqlite sqlite-devel sqlite-libs openssl-devel
-    kill %1
-)
-
-# Function to install a specific Python version
-install_python_version() {
-    local version=$1
-    case $version in
-    "3.9" | "3.11" | "3.12")
-        yum install -y python${version} python${version}-devel python${version}-pip
-        ;;
-    "3.10")
-        if ! python3.10 --version &>/dev/null; then
-            echo "Now installing python3.10..."
-            wget https://www.python.org/ftp/python/3.10.14/Python-3.10.14.tgz
-            tar xf Python-3.10.14.tgz
-            cd Python-3.10.14
-            ./configure --prefix=/usr/local --enable-optimizations
-            (
-                while true; do
-                    sleep 60
-                    echo "Still building python3.10..."
-                done &
-                make -j2
-                kill %1
-            )
-            make altinstall
-            echo "Python installation successful..."
-            python3.10 --version
-            cd ..
-        fi
-        ;;
-    "3.13")
-        if ! python3.13 --version &>/dev/null; then
-            echo "Now installing python3.13..."
-            wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0rc1.tgz
-            tar xzf Python-3.13.0rc1.tgz
-            cd Python-3.13.0rc1
-            ./configure --prefix=/usr/local --enable-optimizations
-            echo "Still building..."
-            (
-                while true; do
-                    sleep 60
-                    echo "Still building python3.13..."
-                done &
-                make -j2
-                kill %1
-            )
-            make altinstall
-            cd .. && rm -rf Python-3.13.0rc1.tgz
-        fi
-        ;;
-    *)
-        echo "Unsupported Python version: $version"
-        exit 1
-        ;;
-    esac
-}
-
-# Install the specified Python version
-install_python_version "$PYTHON_VERSION"
-
 # Function to check for setup.py or *.toml files in a directory
 check_files_in_directory() {
     local dir=$1
@@ -148,14 +78,8 @@ if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then # Check if TEMP_BUILD_SCRIPT_PATH is n
 
     package_name=$(grep -oP '(?<=^PACKAGE_NAME=).*' "$TEMP_BUILD_SCRIPT_PATH" | tr -d '"')
 
-    (
-        while true; do
-            sleep 60
-            echo "Still script is running..."
-        done &
-        sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS
-        kill %1
-    )
+    sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS
+
 else
     echo "No build script to run, skipping execution."
 fi
