@@ -15,6 +15,60 @@ EXTRA_ARGS="${@:3}" # Capture all additional arguments passed to the script
 
 CURRENT_DIR="${PWD}"
 
+# install required dependencies
+echo "Installing dependencies required for python installation..."
+yum install -y sudo zlib-devel wget ncurses git gcc gcc-c++ make cmake
+yum install -y libffi libffi-devel sqlite sqlite-devel sqlite-libs openssl-devel
+
+# Function to install a specific Python version
+install_python_version() {
+    local version=$1
+    case $version in
+    "3.9" | "3.11" | "3.12")
+        yum install -y python${version} python${version}-devel python${version}-pip
+        ;;
+    "3.10")
+        if ! python3.10 --version &>/dev/null; then
+            echo "Now installing python3.10..."
+            wget https://www.python.org/ftp/python/3.10.14/Python-3.10.14.tgz
+            tar xf Python-3.10.14.tgz
+            cd Python-3.10.14
+            echo "Building python3.10..."
+            ./configure --prefix=/usr/local --enable-optimizations
+            echo "Still building..."
+            make -j2
+            echo "Still building..."
+            make altinstall
+            echo "Python installation successful..."
+            python3.10 --version
+            cd ..
+        fi
+        ;;
+    "3.13")
+        if ! python3.13 --version &>/dev/null; then
+            echo "Now installing python3.13..."
+            wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0rc1.tgz
+            tar xzf Python-3.13.0rc1.tgz
+            cd Python-3.13.0rc1
+            echo "Building python3.13..."
+            ./configure --prefix=/usr/local --enable-optimizations
+            echo "Still building..."
+            make -j2
+            echo "Still building..."
+            make altinstall
+            cd .. && rm -rf Python-3.13.0rc1.tgz
+        fi
+        ;;
+    *)
+        echo "Unsupported Python version: $version"
+        exit 1
+        ;;
+    esac
+}
+
+# Install the specified Python version
+install_python_version "$PYTHON_VERSION"
+
 # Function to check for setup.py or *.toml files in a directory
 check_files_in_directory() {
     local dir=$1
@@ -79,7 +133,6 @@ if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then # Check if TEMP_BUILD_SCRIPT_PATH is n
     package_name=$(grep -oP '(?<=^PACKAGE_NAME=).*' "$TEMP_BUILD_SCRIPT_PATH" | tr -d '"')
 
     sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS
-
 else
     echo "No build script to run, skipping execution."
 fi
