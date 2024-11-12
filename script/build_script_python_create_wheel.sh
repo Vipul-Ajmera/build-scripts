@@ -17,10 +17,8 @@ CURRENT_DIR="${PWD}"
 
 # install required dependencies
 echo "Installing dependencies required for python installation..."
-yum install -y sudo zlib-devel wget ncurses git gcc gcc-c++
-yum install -y libffi libffi-devel sqlite sqlite-devel sqlite-libs
-yum install -y make cmake openssl-devel
-echo "Installing dependencies required for python installation completed..."
+yum install -y sudo zlib-devel wget ncurses git gcc gcc-c++ make cmake
+yum install -y libffi libffi-devel sqlite sqlite-devel sqlite-libs openssl-devel
 
 # Function to install a specific Python version
 install_python_version() {
@@ -32,15 +30,18 @@ install_python_version() {
     "3.10")
         if ! python3.10 --version &>/dev/null; then
             echo "Now installing python3.10..."
-            wget https://www.python.org/ftp/python/3.10.15/Python-3.10.15.tgz
-            tar xf Python-3.10.15.tgz
-            echo "Building python3.10..."
-            cd Python-3.10.15
-            echo "Still building..."
+            wget https://www.python.org/ftp/python/3.10.14/Python-3.10.14.tgz
+            tar xf Python-3.10.14.tgz
+            cd Python-3.10.14
             ./configure --prefix=/usr/local --enable-optimizations
-            echo "Still building..."
-            make -j2
-            echo "Still building..."
+            (
+                while true; do
+                    sleep 60
+                    echo "Still building python3.10..."
+                done &
+                make -j2
+                kill %1
+            )
             make altinstall
             echo "Python installation successful..."
             python3.10 --version
@@ -53,11 +54,16 @@ install_python_version() {
             wget https://www.python.org/ftp/python/3.13.0/Python-3.13.0rc1.tgz
             tar xzf Python-3.13.0rc1.tgz
             cd Python-3.13.0rc1
-            echo "Building python3.13..."
             ./configure --prefix=/usr/local --enable-optimizations
             echo "Still building..."
-            make -j2
-            echo "Still building..."
+            (
+                while true; do
+                    sleep 60
+                    echo "Still building python3.13..."
+                done &
+                make -j2
+                kill %1
+            )
             make altinstall
             cd .. && rm -rf Python-3.13.0rc1.tgz
         fi
