@@ -17,8 +17,15 @@ CURRENT_DIR="${PWD}"
 
 # install required dependencies
 echo "Installing dependencies required for python installation..."
-yum install -y sudo zlib-devel wget ncurses git gcc gcc-c++ make cmake
-yum install -y libffi libffi-devel sqlite sqlite-devel sqlite-libs openssl-devel
+(
+    while true; do
+        sleep 60
+        echo "Still installing dependencies..."
+    done &
+    yum install -y sudo zlib-devel wget ncurses git gcc gcc-c++ make cmake
+    yum install -y libffi libffi-devel sqlite sqlite-devel sqlite-libs openssl-devel
+    kill %1
+)
 
 # Function to install a specific Python version
 install_python_version() {
@@ -141,7 +148,14 @@ if [ -n "$TEMP_BUILD_SCRIPT_PATH" ]; then # Check if TEMP_BUILD_SCRIPT_PATH is n
 
     package_name=$(grep -oP '(?<=^PACKAGE_NAME=).*' "$TEMP_BUILD_SCRIPT_PATH" | tr -d '"')
 
-    sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS
+    (
+        while true; do
+            sleep 60
+            echo "Still script is running..."
+        done &
+        sh "$TEMP_BUILD_SCRIPT_PATH" $EXTRA_ARGS
+        kill %1
+    )
 else
     echo "No build script to run, skipping execution."
 fi
