@@ -68,8 +68,6 @@ jobs:
       if: env(WHEEL_CREATION) = true
       name: "Create Wheel for Python 3.9"
       env: PYTHON_VERSION="3.9"
-      language: python
-      python: "3.9"
       script:
         - source variable.sh
         - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
@@ -86,8 +84,6 @@ jobs:
     - name: "Create Wheel for Python 3.10"
       if: env(WHEEL_CREATION) = true
       env: PYTHON_VERSION="3.10"
-      language: python
-      python: "3.10"
       script:
         - source variable.sh
         - chmod +x ./script/build_package_python.sh
