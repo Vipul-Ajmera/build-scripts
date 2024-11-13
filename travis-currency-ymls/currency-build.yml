@@ -133,7 +133,7 @@ jobs:
       env: PYTHON_VERSION="3.13"
       script:
         - source variable.sh
-        - chmod +x ./script/build_package_python.sh;bash ./script/build_package_python.sh
+        - chmod +x ./script/build_package_python.sh; bash ./script/build_package_python.sh;
         - WHEEL_FILE=*.whl
         #- chmod +x ./script/upload-scripts/upload_file_python.sh; bash ./script/upload-scripts/upload_file_python.sh $WHEEL_FILE
       workspaces:
