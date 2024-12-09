@@ -47,7 +47,9 @@ jobs:
         - mkdir package-cache && sudo mv variable.sh package-cache
         - chmod +x ./script/build_package.sh; bash ./script/build_package.sh;
         # setting a variable cloned_package,the value of the variable is based on recently cloned package through build-script execution.
-        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" package-cache
+        # Creating a subdirectory under package-cache for the cloned package to avoid moving package-cache into itself
+        # Moving the cloned package into a subfolder under package-cache to avoid the recursive move error
+        - cloned_package=$(ls -td -- */ | head -n 1) && sudo mv "$cloned_package" "package-cache/$(basename $cloned_package)"
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> package-cache/variable.sh
         - cd package-cache
         # changing the ownership of package-cache and it's sub directories to travis, the reason for doing that is to facilitate creation of files 
