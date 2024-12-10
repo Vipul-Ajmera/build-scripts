@@ -50,7 +50,7 @@ jobs:
         # Creating a subdirectory under package-cache for the cloned package to avoid moving package-cache into itself
         # Moving the cloned package into a subfolder under package-cache to avoid the recursive move error
         - cloned_package=$(find . -maxdepth 1 -type d ! -name 'package-cache' ! -name '.' | sort -n | tail -1) && sudo mv "$cloned_package" "package-cache/$(basename $cloned_package)"
-        - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> package-cache/variable.sh
+        - echo "export CLONED_PACKAGE=\"$(basename "$cloned_package")\"" >> package-cache/variable.sh
         - cd package-cache
         # changing the ownership of package-cache and it's sub directories to travis, the reason for doing that is to facilitate creation of files 
         # in the cloned package folder(note: currently cloned package folder is owned by the root)
