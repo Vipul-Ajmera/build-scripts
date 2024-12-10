@@ -22,7 +22,6 @@ SCRIPT_PACKAGE_VERSION=tower-0.5.0
 PACKAGE_NAME=tower
 PACKAGE_VERSION=${1:-${SCRIPT_PACKAGE_VERSION}}
 PACKAGE_URL=https://github.com/tower-rs/tower.git
-BUILD_HOME=home/
 
 # Install update and deps
 yum update -y
@@ -52,10 +51,6 @@ fi
 # set env variable
 set RUST_BACKTRACE=full
 
-# Change to home directory
-cd /home/
-
-
 # Build and install tonic
 git clone $PACKAGE_URL
 cd $PACKAGE_NAME
@@ -80,7 +75,7 @@ else
     echo "------------------$PACKAGE_NAME:install_&_test_both_success-------------------------"
     echo "$PACKAGE_URL $PACKAGE_NAME"
     echo "$PACKAGE_NAME  |  $PACKAGE_URL | $PACKAGE_VERSION | GitHub  | Pass |  Both_Install_and_Test_Success"
-    export Tower_Build='/home/tower/target/release/libtower.d'
+    export Tower_Build='/tower/target/release/libtower.d'
     echo "Tower Build completed."
     echo "Tower bit binary is available at [$Tower_Build]."
     exit 0
