@@ -47,7 +47,8 @@ jobs:
         - mkdir package-cache && sudo mv variable.sh package-cache
         - chmod +x ./script/build_package.sh; bash ./script/build_package.sh;
         # setting a variable cloned_package,the value of the variable is based on recently cloned package through build-script execution.
-        - cloned_package=$(ls -td -- */ | head -n 1)
+        - cloned_package=$(find . -maxdepth 1 -type d ! -name 'package-cache' -print0 | xargs -0 ls -td | head -n 1) 
+        - cloned_package=$(basename "$cloned_package")
         - echo "$cloned_package"
         - sudo mv "$cloned_package" package-cache
         - echo "export CLONED_PACKAGE=\"$cloned_package\"" >> package-cache/variable.sh
