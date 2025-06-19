@@ -6,6 +6,7 @@ language: shell
 branches:
   only:
     - master
+    - final_pr_py
 
 env:
   global:
