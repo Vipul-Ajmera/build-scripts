@@ -74,6 +74,7 @@ jobs:
         - echo "wheel build python 3.9"
         - source variable.sh
         - chmod +x ./script/build_wheels.sh; bash ./script/build_wheels.sh;
+        - chmod a+r *.whl
         - WHEEL_FILE=*.whl
         - chmod +x ./script/upload-scripts/upload_wheel.sh; bash ./script/upload-scripts/upload_wheel.sh $WHEEL_FILE
       workspaces:
@@ -91,6 +92,7 @@ jobs:
         - echo "wheel build python 3.10"
         - source variable.sh
         - chmod +x ./script/build_wheels.sh; bash ./script/build_wheels.sh;
+        - chmod a+r *.whl
         - WHEEL_FILE=*.whl
         - chmod +x ./script/upload-scripts/upload_wheel.sh; bash ./script/upload-scripts/upload_wheel.sh $WHEEL_FILE
       workspaces:
@@ -107,6 +109,7 @@ jobs:
         - echo "wheel build python 3.11"
         - source variable.sh
         - chmod +x ./script/build_wheels.sh; bash ./script/build_wheels.sh;
+        - chmod a+r *.whl
         - WHEEL_FILE=*.whl
         - chmod +x ./script/upload-scripts/upload_wheel.sh; bash ./script/upload-scripts/upload_wheel.sh $WHEEL_FILE
       workspaces:
@@ -122,6 +125,7 @@ jobs:
         - echo "wheel build python 3.12"
         - source variable.sh
         - chmod +x ./script/build_wheels.sh; bash ./script/build_wheels.sh;
+        - chmod a+r *.whl
         - WHEEL_FILE=*.whl
         - chmod +x ./script/upload-scripts/upload_wheel.sh; bash ./script/upload-scripts/upload_wheel.sh $WHEEL_FILE
       workspaces:
@@ -138,6 +142,7 @@ jobs:
         - echo "wheel build python 3.13"
         - source variable.sh
         - chmod +x ./script/build_wheels.sh; bash ./script/build_wheels.sh;
+        - chmod a+r *.whl
         - WHEEL_FILE=*.whl
         - chmod +x ./script/upload-scripts/upload_wheel.sh; bash ./script/upload-scripts/upload_wheel.sh $WHEEL_FILE
       workspaces:
