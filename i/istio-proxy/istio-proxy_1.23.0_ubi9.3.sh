@@ -30,7 +30,7 @@ GO_VERSION=${1:-1.23.2}
 GOPATH=$SOURCE_ROOT/go
 GOBIN=/usr/local/go/bin 
 	
-yum install -y wget sudo  cmake patch gcc-toolset-12-libatomic-devel unzip python3.11-devel zip java-11-openjdk-devel git gcc-c++ xz
+sudo yum install -y wget sudo cmake patch gcc-toolset-12-libatomic-devel unzip python3.11-devel zip java-11-openjdk-devel git gcc-c++ xz
 
     
 
