@@ -146,8 +146,15 @@ if [ -f "$stripped_build_script" ]; then
   echo "Tested on value: $tested_on"
 fi
 
-# Export variables
+# Logic to create sha values for the wheels
+BUILD_SCRIPT_DATE=$(git log -1 --format=%ci -- "${build_script}") # Last commit date of the build script
+PACKAGE_LANGUAGE=${PACKAGE_LANGUAGE:-python}
+string_to_hash="${PACKAGE_NAME}_${VERSION}_${PACKAGE_LANGUAGE}_${PYTHON_VERSION}_${BUILD_SCRIPT_DATE}" # Construct the string to hash
+WHEEL_SHA256=$(echo -n "$string_to_hash" | sha256sum | awk '{print $1}') # Generate SHA256 and store in variable
+echo "SHA successfully generated for $string_to_hash"
 
+
+# Export variables
 echo "export VERSION=$VERSION" > $CUR_DIR/variable.sh
 echo "export BUILD_SCRIPT=$build_script" >> $CUR_DIR/variable.sh
 echo "export PKG_DIR_PATH=$package_dirpath" >> $CUR_DIR/variable.sh
@@ -158,6 +165,7 @@ echo "export VARIANT=$variant" >> $CUR_DIR/variable.sh
 echo "export BASENAME=$basename" >> $CUR_DIR/variable.sh
 echo "export NON_ROOT_BUILD=$nonRootBuild" >> $CUR_DIR/variable.sh
 echo "export TESTED_ON=$tested_on" >> $CUR_DIR/variable.sh
+echo "export WHEEL_SHA256=$WHEEL_SHA256" >> $CUR_DIR/variable.sh
 
 chmod +x $CUR_DIR/variable.sh
 cat $CUR_DIR/variable.sh
