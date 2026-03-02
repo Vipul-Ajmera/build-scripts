@@ -149,7 +149,7 @@ fi
 # Logic to create sha values for the wheels
 BUILD_SCRIPT_DATE=$(git log -1 --format=%ci -- "${build_script}") # Last commit date of the build script
 PACKAGE_LANGUAGE=${PACKAGE_LANGUAGE:-python}
-string_to_hash="${PACKAGE_NAME}_${VERSION}_${PACKAGE_LANGUAGE}_${PYTHON_VERSION}_${BUILD_SCRIPT_DATE}" # Construct the string to hash
+string_to_hash="${PACKAGE_NAME}_${VERSION}_${PACKAGE_LANGUAGE}_3.11_${BUILD_SCRIPT_DATE}" # Construct the string to hash
 WHEEL_SHA256=$(echo -n "$string_to_hash" | sha256sum | awk '{print $1}') # Generate SHA256 and store in variable
 echo "SHA successfully generated for $string_to_hash"
 
