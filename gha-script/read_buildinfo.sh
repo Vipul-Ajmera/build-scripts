@@ -19,6 +19,7 @@ CUR_DIR=$(pwd)
 cd $package_dirpath
 echo "printing the list of contents"
 pwd
+BUILD_SCRIPT_PATH=${pwd}
 ls -ltr
 
 
@@ -147,8 +148,8 @@ if [ -f "$stripped_build_script" ]; then
 fi
 
 # Logic to create sha values for the wheels
-BUILD_SCRIPT_PATH=${CUR_DIR}/${package_dirpath}/${build_script}
-echo "Build script path:  $BUILD_SCRIPT_PATH"
+BUILD_SCRIPT_PATH1="${BUILD_SCRIPT_PATH}${build_script//[\"\']/}"
+echo "Build script path:  $BUILD_SCRIPT_PATH1"
 BUILD_SCRIPT_DATE=$(git log -1 --format=%ci -- "${BUILD_SCRIPT_PATH}") # Last commit date of the build script
 PACKAGE_LANGUAGE=${PACKAGE_LANGUAGE:-python}
 string_to_hash="${PACKAGE_NAME}_${VERSION}_${PACKAGE_LANGUAGE}_311_${BUILD_SCRIPT_DATE}" # Construct the string to hash
