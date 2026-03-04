@@ -20,6 +20,7 @@ cd $package_dirpath
 echo "printing the list of contents"
 pwd
 BUILD_SCRIPT_PATH=${pwd}
+echo "BUILD SCRIPT PATH: $BUILD_SCRIPT_PATH"
 ls -ltr
 
 
