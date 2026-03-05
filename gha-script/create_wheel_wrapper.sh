@@ -1,8 +1,12 @@
-#!/bin/bash -e
+#!/bin/bash
+set -e
+
+#export SOURCE_DATE_EPOCH=$(date -d "2026-01-01 00:00:00 UTC" +%s)
 
 PYTHON_VERSION=$1
 BUILD_SCRIPT_PATH=${2:-""}
-EXTRA_ARGS="${@:3}" # Capture all additional arguments passed to the script
+SUFFIX=${3:-""}
+EXTRA_ARGS="${@:4}" # Capture all additional arguments passed to the script
 CURRENT_DIR="${PWD}"
 EXIT_CODE=0
 
@@ -23,7 +27,11 @@ install_python_version() {
     local version=$1
     echo "Installing Python version: $version"
     case $version in
-    "3.9" | "3.11" | "3.12")
+	"3.9")
+        echo "Starting python installing..."
+        yum install -y python3 python3-devel python3-pip
+        ;;
+    "3.11" | "3.12")
         echo "Starting python installing..."
         yum install -y python${version} python${version}-devel python${version}-pip
         ;;
@@ -32,7 +40,7 @@ install_python_version() {
             echo "Installing dependencies required for python installation..."
             yum install -y sudo zlib-devel wget ncurses git
             echo "Installing..."
-            yum install -y make cmake openssl-devel
+            yum install -y make cmake openssl-devel xz xz-devel
             echo "Installing..."
             yum install -y libffi libffi-devel sqlite sqlite-devel sqlite-libs bzip2-devel
             echo "Starting python installing..."
@@ -53,7 +61,7 @@ install_python_version() {
             echo "Installing dependencies required for python installation..."
             yum install -y sudo zlib-devel wget ncurses git
             echo "Installing..."
-            yum install -y make cmake openssl-devel
+            yum install -y make cmake openssl-devel xz xz-devel
             echo "Installing..."
             yum install -y libffi libffi-devel sqlite sqlite-devel sqlite-libs bzip2-devel
             echo "Starting python installing..."
@@ -119,25 +127,23 @@ cleanup() {
     rm -rf "$VENV_DIR"
 }
 
+SUFFIX="${VERSION_SUFFIX}"
+echo "Using VERSION_SUFFIX: $SUFFIX"
+
 # Function to modify the metadata file after wheel creation
 modify_metadata_file() {
     local wheel_path="$1"
     
-    # Create a temporary directory for unzipping the wheel file
     temp_dir="temp_directory"
     mkdir -p "$temp_dir"
 
-    # Extract wheel to temp directory
     unzip -q "$wheel_path" -d "$temp_dir"
 
-    # Find metadata file
     local metadata_file
     metadata_file=$(find "$temp_dir" -name METADATA -path "*.dist-info/*")
 
-    # New classifier to add
     local new_classifier="Classifier: Environment :: MetaData :: IBM Python Ecosystem"
 
-    # Only proceed if the classifier is not already present
     if grep -q "^$new_classifier$" "$metadata_file"; then
         echo "Classifier already exists in $wheel_path — no changes made."
     else
@@ -170,16 +176,11 @@ modify_metadata_file() {
             }
         ' "$metadata_file" > "$metadata_file.tmp" && mv "$metadata_file.tmp" "$metadata_file"
 
-        # Get the original wheel file name
         wheel_file_name=$(basename "$wheel_path")
-
-        # Repack wheel
         cd "$temp_dir" && zip -q -r "$CURRENT_DIR/$wheel_file_name" ./*
-
         echo "Added IBM classifier to $wheel_path"
     fi
 
-    # Clean up
     rm -rf "$CURRENT_DIR/$temp_dir"
 }
 
@@ -212,13 +213,13 @@ else
     echo "No build script to run, skipping execution."
 fi
 
-#checking if wheel is generated through script itself
+# Checking if wheel is generated through script itself
 cd $CURRENT_DIR
 if ls *.whl 1>/dev/null 2>&1; then
     echo "Wheel file already exist in the current directory:"
     ls *.whl
 else
-    #Navigating to the package directory to build wheel
+    # Navigating to the package directory to build wheel
     if [ -d "$package_dir" ]; then
         echo "Navigating to the package directory: $package_dir"
         cd "$package_dir"
@@ -229,12 +230,9 @@ else
 
     echo "=============== Building wheel =================="
 
-    # Attempt to build the wheel without isolation
     if ! python -m build --wheel --no-isolation --outdir="$CURRENT_DIR/"; then
         echo "============ Wheel Creation Failed for Python $PYTHON_VERSION (without isolation) ================="
         echo "Attempting to build with isolation..."
-
-        # Attempt to build the wheel without isolation
         if ! python -m build --wheel --outdir="$CURRENT_DIR/"; then
             echo "============ Wheel Creation Failed for Python $PYTHON_VERSION ================="
             EXIT_CODE=1
@@ -242,12 +240,99 @@ else
     fi
 fi
 
-cd $CURRENT_DIR
+cd "$CURRENT_DIR"
+
+# ----------------- Auditwheel Repair Section -----------------
+LOGFILE="$CURRENT_DIR/auditwheel.log"
+WHEELHOUSE="$CURRENT_DIR/wheelhouse"
+mkdir -p "$WHEELHOUSE"
+
+wheel_count=$(ls *.whl 2>/dev/null | wc -l)
+echo "Wheel count detected: $wheel_count"
+
+if [ "$wheel_count" -eq 1 ]; then
+    wheel_file=$(ls *.whl)
+    echo "=============== Running auditwheel repair on $wheel_file =================="
+    pip install auditwheel "patchelf>=0.14"
+
+    audit_output=$(auditwheel repair "$wheel_file" --wheel-dir "$WHEELHOUSE" 2>&1) || true
+
+    echo "$audit_output" > "$LOGFILE"
+    echo "Auditwheel output saved to auditwheel.log"
+
+    if echo "$audit_output" | grep -q "ValueError: Cannot repair wheel"; then
+        echo "Auditwheel errored for $wheel_file"
+        touch "$CURRENT_DIR/audit_wheel_errored"
+        echo "$audit_output"
+    elif echo "$audit_output" | grep -q "This does not look like a platform wheel"; then
+        echo "Auditwheel skipped for $wheel_file (pure Python wheel)"
+        touch "$CURRENT_DIR/audit_wheel_skipped"
+    else
+        echo "Auditwheel succeeded for $wheel_file"
+        # Uncomment below if you want to use repaired wheel
+        # repaired_wheel=$(ls "$WHEELHOUSE"/*.whl)
+        # wheel_file="$repaired_wheel"
+        # echo "Running .so license injection and adding suffix"
+        # repaired_wheel=$(ls "$WHEELHOUSE"/*.whl)
+        # WORKDIR="$CURRENT_DIR/extracted_wheel"
+        # rm -rf "$WORKDIR"
+        # mkdir -p "$WORKDIR"
+        # wheel unpack "$repaired_wheel" -d "$WORKDIR"
+        # extracted_dir=$(find "$WORKDIR" -maxdepth 1 -type d ! -path "$WORKDIR" | head -n 1)
+        # if [ -z "$extracted_dir" ]; then
+        #     echo "Failed to locate extracted wheel directory"
+        #     exit 1
+        # fi
+
+        # if [[ "$repaired_wheel" != *"+"* ]]; then
+        #     python license_suffix.py "$extracted_dir" "$SUFFIX"
+        # else
+        #     echo "Wheel already suffixed → skipping suffix injection"
+        #     python license_suffix.py "$extracted_dir" ""
+        # fi
+
+        # wheel pack "$extracted_dir" -d "$CURRENT_DIR"
+
+        echo "Running wheel post processing"
+
+        repaired_wheel=$(ls "$WHEELHOUSE"/*.whl)
+        VERSION=$(echo "$repaired_wheel" | cut -d '-' -f2)
+        echo "Calling process_wheel.sh for:"
+        echo "Wheel → $repaired_wheel"
+        echo "Package → $package_name"
+        echo "Version → $VERSION"
+
+		source ./gha-script/process_wheel.sh "$repaired_wheel" "$package_name" "$VERSION"
+
+        #echo "Running sha256"
+        # SHA256=$(sha256sum $WHEELHOUSE/*.whl)
+        # echo "$SHA256"
+        # SHA256_FILE="${CURRENT_DIR}/$(basename "$wheel_file").sha256"
+        # echo "$SHA256" > "$SHA256_FILE"
+        # echo "SHA256 for $(basename "$wheel_file") saved to $SHA256_FILE"
+        #for wheel in "$WHEELHOUSE"/*.whl; do
+            # Skip if no wheels are found
+            #[ -e "$wheel" ] || continue
+
+            #sha256sum "$wheel" > "${wheel}.sha256"
+        #done
+    fi
+
+else
+    echo "Wheel count is $wheel_count (0 or more than 1), marking as errored"
+    touch "$CURRENT_DIR/audit_wheel_errored"
+    echo "$audit_output"
+fi
+
+echo "Auditwheel section completed."
+# ----------------- End of Auditwheel Section -----------------
+
+
+# Optionally modify metadata
 if ls *.whl 1>/dev/null 2>&1; then
     echo "=============== Modifying Metadata file =================="
-    #add modifying metadata file
     wheel_file=$(ls *.whl 1>/dev/null 2>&1 && echo *.whl)
-    modify_metadata_file "$wheel_file"
+    #modify_metadata_file "$wheel_file"
 fi
 
 # Clean up virtual environment
@@ -257,3 +342,4 @@ cleanup "$VENV_DIR"
 [ -n "$TEMP_BUILD_SCRIPT_PATH" ] && rm "$CURRENT_DIR/$TEMP_BUILD_SCRIPT_PATH"
 
 exit $EXIT_CODE
+
