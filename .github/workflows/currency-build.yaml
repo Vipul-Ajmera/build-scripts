@@ -265,8 +265,10 @@ jobs:
         run: |
           sudo chmod a+r *.whl
           WHEEL_FILE=*.whl
+          SHA256_VALUE=$(cat sha256.sha)
+          
           chmod +x ./gha-script/upload-scripts/upload_wheel.sh
-          bash ./gha-script/upload-scripts/upload_wheel.sh $WHEEL_FILE
+          bash ./gha-script/upload-scripts/upload_wheel.sh $WHEEL_FILE $SHA256_VALUE
         continue-on-error: ${{ matrix.allow-failure }}
 
   wheel_licenses:
