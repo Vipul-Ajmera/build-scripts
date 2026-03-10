@@ -501,7 +501,7 @@ def process_wheel(wheel_path, suffix):
                     for so_file in so_files:
                         process_so_file(so_file, rpm_licenses, bundled_licenses)
             else:
-                logger.info(".libs directory not found, No .so files were added, skipping adding licenses (likely no-arch wheel)")
+                logger.info(".libs directory not found, No .so files were added, skipping adding licenses")
 
             dist_info = find_dist_info_dir(extract_path)
             old_version = None
