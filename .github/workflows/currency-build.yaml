@@ -121,7 +121,7 @@ jobs:
   build:
     needs: build_info
     if: ${{ inputs.validate_build_script == 'true' }}
-    runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le }}
+    runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le' }}
     steps:
       - uses: actions/checkout@v6
 
@@ -185,7 +185,7 @@ jobs:
   wheel_build_py310:
     needs: build_info
     if: ${{ inputs.wheel_build == 'true' }}
-    runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le }}
+    runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le' }}
     env:
       GHA_CURRENCY_SERVICE_ID_API_KEY: ${{ secrets.GHA_CURRENCY_SERVICE_ID_API_KEY }}
       GHA_CURRENCY_SERVICE_ID: ${{ secrets.GHA_CURRENCY_SERVICE_ID }}
@@ -256,7 +256,7 @@ jobs:
   wheel_build_py311:
     needs: build_info
     if: ${{ inputs.wheel_build == 'true' }}
-    runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le }}
+    runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le' }}
     env:
       GHA_CURRENCY_SERVICE_ID_API_KEY: ${{ secrets.GHA_CURRENCY_SERVICE_ID_API_KEY }}
       GHA_CURRENCY_SERVICE_ID: ${{ secrets.GHA_CURRENCY_SERVICE_ID }}
@@ -343,7 +343,7 @@ jobs:
   wheel_build_py312:
     needs: build_info
     if: ${{ inputs.wheel_build == 'true' }}
-    runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le }}
+    runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le' }}
     env:
       GHA_CURRENCY_SERVICE_ID_API_KEY: ${{ secrets.GHA_CURRENCY_SERVICE_ID_API_KEY }}
       GHA_CURRENCY_SERVICE_ID: ${{ secrets.GHA_CURRENCY_SERVICE_ID }}
@@ -430,7 +430,7 @@ jobs:
   wheel_build_py313:
    needs: build_info
    if: ${{ inputs.wheel_build == 'true' }}
-   runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le }}
+   runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le' }}
    continue-on-error: true
    env:
       GHA_CURRENCY_SERVICE_ID_API_KEY: ${{ secrets.GHA_CURRENCY_SERVICE_ID_API_KEY }}
@@ -518,7 +518,7 @@ jobs:
   wheel_build_py314:
    needs: build_info
    if: ${{ inputs.wheel_build == 'true' }}
-   runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le }}
+   runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le' }}
    continue-on-error: true
    env:
       GHA_CURRENCY_SERVICE_ID_API_KEY: ${{ secrets.GHA_CURRENCY_SERVICE_ID_API_KEY }}
@@ -792,7 +792,7 @@ jobs:
   build_docker:
     needs: build_info 
     if: ${{ inputs.build_docker == 'true' }}
-    runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le }}
+    runs-on: ${{ inputs.large-runner-label != '' && inputs.large-runner-label || 'ubuntu-24.04-ppc64le' }}
     steps:
       - uses: actions/checkout@v6
 
