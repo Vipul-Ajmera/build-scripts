@@ -238,7 +238,7 @@ jobs:
           mv "$WORKSPACE/wheel_build_log.gz" "$WORKSPACE/$LOG_NAME"
 
           chmod +x ./gha-script/upload-scripts/upload_file.sh
-          bash ./gha-script/upload-scripts/upload_file.sh $LOG_NAME
+          #bash ./gha-script/upload-scripts/upload_file.sh $LOG_NAME
 
       - name: Upload wheel artifact using custom script
         run: |
@@ -247,7 +247,7 @@ jobs:
             WHEEL_FILE=$(ls *.whl)
             SHA256_VALUE=$(cat sha256.sha)
             chmod +x ./gha-script/upload-scripts/upload_wheel.sh
-            bash ./gha-script/upload-scripts/upload_wheel.sh $WHEEL_FILE $SHA256_VALUE
+            #bash ./gha-script/upload-scripts/upload_wheel.sh $WHEEL_FILE $SHA256_VALUE
           else
             echo "No wheel file found!"
             exit 1
@@ -324,7 +324,7 @@ jobs:
   
           echo "Final log file to upload: $LOG_NAME"
           chmod +x ./gha-script/upload-scripts/upload_file.sh
-          bash ./gha-script/upload-scripts/upload_file.sh $LOG_NAME
+          #bash ./gha-script/upload-scripts/upload_file.sh $LOG_NAME
           ls -lh "$WORKSPACE/$LOG_NAME"
   
       - name: Upload wheel artifact using custom script
@@ -334,7 +334,7 @@ jobs:
             WHEEL_FILE=$(ls *.whl)
             SHA256_VALUE=$(cat sha256.sha)
             chmod +x ./gha-script/upload-scripts/upload_wheel.sh
-            bash ./gha-script/upload-scripts/upload_wheel.sh $WHEEL_FILE $SHA256_VALUE
+            #bash ./gha-script/upload-scripts/upload_wheel.sh $WHEEL_FILE $SHA256_VALUE
           else
             echo "No wheel file found!"
             exit 1
@@ -411,7 +411,7 @@ jobs:
 
           echo "Final log file to upload: $LOG_NAME"
           chmod +x ./gha-script/upload-scripts/upload_file.sh
-          bash ./gha-script/upload-scripts/upload_file.sh $LOG_NAME
+          #bash ./gha-script/upload-scripts/upload_file.sh $LOG_NAME
           ls -lh "$WORKSPACE/$LOG_NAME"
   
       - name: Upload wheel artifact using custom script
@@ -421,7 +421,7 @@ jobs:
             WHEEL_FILE=$(ls *.whl)
             SHA256_VALUE=$(cat sha256.sha)
             chmod +x ./gha-script/upload-scripts/upload_wheel.sh
-            bash ./gha-script/upload-scripts/upload_wheel.sh $WHEEL_FILE $SHA256_VALUE
+            #bash ./gha-script/upload-scripts/upload_wheel.sh $WHEEL_FILE $SHA256_VALUE
           else
             echo "No wheel file found!"
             exit 1
@@ -499,7 +499,7 @@ jobs:
 
           echo "Final log file to upload: $LOG_NAME"
           chmod +x ./gha-script/upload-scripts/upload_file.sh
-          bash ./gha-script/upload-scripts/upload_file.sh $LOG_NAME
+          #bash ./gha-script/upload-scripts/upload_file.sh $LOG_NAME
           ls -lh "$WORKSPACE/$LOG_NAME"
   
       - name: Upload wheel artifact using custom script
@@ -509,7 +509,7 @@ jobs:
             WHEEL_FILE=$(ls *.whl)
             SHA256_VALUE=$(cat sha256.sha)
             chmod +x ./gha-script/upload-scripts/upload_wheel.sh
-            bash ./gha-script/upload-scripts/upload_wheel.sh $WHEEL_FILE $SHA256_VALUE
+            #bash ./gha-script/upload-scripts/upload_wheel.sh $WHEEL_FILE $SHA256_VALUE
           else
             echo "No wheel file found!"
             exit 1
@@ -587,7 +587,7 @@ jobs:
 
           echo "Final log file to upload: $LOG_NAME"
           chmod +x ./gha-script/upload-scripts/upload_file.sh
-          bash ./gha-script/upload-scripts/upload_file.sh $LOG_NAME
+          #bash ./gha-script/upload-scripts/upload_file.sh $LOG_NAME
           ls -lh "$WORKSPACE/$LOG_NAME"
   
       - name: Upload wheel artifact using custom script
@@ -597,7 +597,7 @@ jobs:
             WHEEL_FILE=$(ls *.whl)
             SHA256_VALUE=$(cat sha256.sha)
             chmod +x ./gha-script/upload-scripts/upload_wheel.sh
-            bash ./gha-script/upload-scripts/upload_wheel.sh $WHEEL_FILE $SHA256_VALUE
+            #bash ./gha-script/upload-scripts/upload_wheel.sh $WHEEL_FILE $SHA256_VALUE
           else
             echo "No wheel file found!"
             exit 1
