@@ -249,7 +249,8 @@ mkdir -p "$WHEELHOUSE"
 EXCLUDE_ARGS=()
 if [ -n "$AUDITWHEEL_EXCLUDE" ]; then
   echo "Adding package-specific auditwheel exclusions: $AUDITWHEEL_EXCLUDE"
-  for lib in $AUDITWHEEL_EXCLUDE; do
+  read -ra exclude_libs <<< "$AUDITWHEEL_EXCLUDE"
+  for lib in "${exclude_libs[@]}"; do
     EXCLUDE_ARGS+=("--exclude" "$lib")
   done
 else
